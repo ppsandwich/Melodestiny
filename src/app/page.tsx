@@ -154,12 +154,6 @@ export default function Home() {
         <div className="flex flex-col gap-6 pt-0 lg:pt-[108px] min-w-0">
           {result ? (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out min-w-0">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-8 border-b border-subtle pb-6 min-w-0">
-                <div>
-                  <h2 className="text-3xl font-display">Analysis Dashboard</h2>
-                  <p className="text-sepia font-body mt-1">Found {result.techniques.length} techniques applied.</p>
-                </div>
-              </div>
 
               <TechniqueScoresCard techniques={result.techniques} total_score={result.total_score} />
               
