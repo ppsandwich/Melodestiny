@@ -28,7 +28,7 @@ export function TechniqueScoresCard({ techniques, total_score }: { techniques: T
         </div>
         
         {/* Score Badge */}
-        <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gold shadow-card flex items-center justify-center text-ink border-4 border-double border-ink/20 flex-shrink-0">
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gold shadow-card flex items-center justify-center text-black border-4 border-double border-ink/20 flex-shrink-0">
           <div className="text-center">
             <div className="text-3xl font-display font-bold leading-none">{Math.round(total_score)}</div>
             <div className="text-[10px] uppercase tracking-widest font-mono mt-1 opacity-80">Score</div>

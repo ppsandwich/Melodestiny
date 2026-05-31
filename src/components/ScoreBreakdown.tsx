@@ -47,24 +47,45 @@ export function ScoreBreakdown({ techniques }: { techniques: TechniqueResult[] }
                   {t.feedback}
                 </p>
                 
-                {t.flags.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-subtle/30">
-                    <h4 className="text-sm font-bold text-sepia uppercase tracking-wider mb-2">Specific Flags</h4>
-                    <ul className="space-y-2">
-                      {t.flags.map((flag, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm w-full">
-                          <span className={`
-                            mt-0.5 inline-block w-2 h-2 rounded-full flex-shrink-0
-                            ${flag.type_ === 'Positive' ? 'bg-sage' : 
-                              flag.type_ === 'Negative' ? 'bg-rust' : 'bg-blue-grey'}
-                          `}></span>
-                          <span className="font-mono text-sepia min-w-[50px] flex-shrink-0">Line {flag.line_number}:</span>
-                          <span className="font-body text-ink/90 flex-1 min-w-0 break-words">{flag.message}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                {t.flags.length > 0 && (() => {
+                  const groupedFlags: { [msg: string]: { type_: string, lines: number[] } } = {};
+                  t.flags.forEach(flag => {
+                    if (!groupedFlags[flag.message]) {
+                      groupedFlags[flag.message] = { type_: flag.type_, lines: [] };
+                    }
+                    groupedFlags[flag.message].lines.push(flag.line_number);
+                  });
+                  const uniqueFlags = Object.entries(groupedFlags).map(([message, data]) => {
+                    const sortedLines = data.lines.sort((a, b) => a - b);
+                    return { message, type_: data.type_, firstLine: sortedLines[0], otherLines: sortedLines.slice(1) };
+                  }).sort((a, b) => a.firstLine - b.firstLine);
+
+                  return (
+                    <div className="mt-4 pt-4 border-t border-subtle/30">
+                      <h4 className="text-sm font-bold text-sepia uppercase tracking-wider mb-2">Specific Flags</h4>
+                      <ul className="space-y-2">
+                        {uniqueFlags.map((flag, idx) => (
+                          <li key={idx} className="flex items-start gap-2 text-sm w-full">
+                            <span className={`
+                              mt-0.5 inline-block w-2 h-2 rounded-full flex-shrink-0
+                              ${flag.type_ === 'Positive' ? 'bg-sage' : 
+                                flag.type_ === 'Negative' ? 'bg-rust' : 'bg-blue-grey'}
+                            `}></span>
+                            <span className="font-mono text-sepia min-w-[50px] flex-shrink-0">Line {flag.firstLine}:</span>
+                            <span className="font-body text-ink/90 flex-1 min-w-0 break-words">
+                              {flag.message}
+                              {flag.otherLines.length > 0 && (
+                                <span className="text-sepia/80 ml-1">
+                                  (also Line {flag.otherLines.join(', Line ')})
+                                </span>
+                              )}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           );
