@@ -88,7 +88,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen p-4 md:p-8 flex justify-center w-full overflow-hidden">
-      <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-[1fr_400px] xl:grid-cols-[1fr_500px] gap-8 min-w-0">
+      <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-[1fr_400px] xl:grid-cols-[1fr_500px] gap-8 min-w-0 mt-[30px]">
         
         {/* Left Column: Unified Editor */}
         <div className="flex flex-col gap-6 min-w-0">
@@ -96,7 +96,7 @@ export default function Home() {
             <div className="absolute top-0 right-0 z-20">
               <ThemeToggle />
             </div>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-title mb-2 text-ink flex items-center gap-3 sm:gap-4 flex-wrap break-words pr-12">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-title mb-2 text-ink flex items-center gap-3 sm:gap-4 flex-wrap break-words pr-12">
               <FontAwesomeIcon icon={faPenFancy} className="text-gold opacity-90 flex-shrink-0" />
               Melodestiny
             </h1>
