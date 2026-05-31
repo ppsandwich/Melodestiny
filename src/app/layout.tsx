@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, Lora, IBM_Plex_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -25,8 +26,8 @@ const syamsiah = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Melodestiny - Lyric Analysis",
-  description: "Score pop songs on structural and lyrical quality.",
+  title: "Melodestiny",
+  description: "The songwriter's analytical companion",
 };
 
 export default function RootLayout({
@@ -35,11 +36,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${playfair.variable} ${lora.variable} ${ibmPlexMono.variable} ${syamsiah.variable} min-h-full flex flex-col`}
       >
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

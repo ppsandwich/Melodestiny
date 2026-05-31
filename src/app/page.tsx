@@ -12,6 +12,7 @@ import { processSyllables } from "@/app/actions";
 import { useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenFancy, faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Home() {
   const [title, setTitle] = useState("");
@@ -91,8 +92,11 @@ export default function Home() {
         
         {/* Left Column: Unified Editor */}
         <div className="flex flex-col gap-6 min-w-0">
-          <header className="mb-4">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-title mb-2 text-ink flex items-center gap-3 sm:gap-4 flex-wrap break-words">
+          <header className="mb-4 relative">
+            <div className="absolute top-0 right-0 z-20">
+              <ThemeToggle />
+            </div>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-title mb-2 text-ink flex items-center gap-3 sm:gap-4 flex-wrap break-words pr-12">
               <FontAwesomeIcon icon={faPenFancy} className="text-gold opacity-90 flex-shrink-0" />
               Melodestiny
             </h1>
