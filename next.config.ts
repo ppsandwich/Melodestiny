@@ -10,14 +10,6 @@ const nextConfig: NextConfig = {
     };
     return config;
   },
-  experimental: {
-    turbo: {
-      resolveAlias: {
-        // Dummy alias to tell Next.js that we explicitly acknowledge Turbopack.
-        // This clears the "no turbopack config" error.
-      }
-    }
-  }
 };
 
 export default nextConfig;
