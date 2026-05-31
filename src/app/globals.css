@@ -45,7 +45,7 @@
     --color-rust-val: #9C4E33;
     --color-sage-val: #50644D;
     --color-blue-grey-val: #566D80;
-    --color-border-subtle: rgba(122,138,122,0.2);
+    --color-border-subtle: rgba(122,138,122,0.1);
   }
 
   html, body {
