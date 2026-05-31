@@ -12,8 +12,10 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     turbo: {
-      // Acknowledge Turbopack usage to clear the error.
-      // Turbopack supports WASM out-of-the-box in Next 15.
+      resolveAlias: {
+        // Dummy alias to tell Next.js that we explicitly acknowledge Turbopack.
+        // This clears the "no turbopack config" error.
+      }
     }
   }
 };
