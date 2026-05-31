@@ -22,9 +22,9 @@ export function ScoreBreakdown({ techniques }: { techniques: TechniqueResult[] }
                 <div className="flex items-start sm:items-center gap-4 flex-1 min-w-0">
                   <div className={`
                     w-12 text-center py-1 rounded text-sm font-mono font-medium flex-shrink-0
-                    ${t.raw_score >= 0.8 ? 'bg-sage text-cream' : 
-                      t.raw_score >= 0.5 ? 'bg-gold text-ink' : 
-                      'bg-rust text-cream'}
+                    ${t.raw_score >= 0.8 ? 'bg-sage text-white' : 
+                      t.raw_score >= 0.5 ? 'bg-gold text-black' : 
+                      'bg-rust text-white'}
                   `}>
                     {Math.round(t.raw_score * 100)}
                   </div>
