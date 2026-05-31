@@ -1,0 +1,15 @@
+{
+  "name": "melodestiny-core",
+  "type": "module",
+  "version": "0.1.0",
+  "files": [
+    "melodestiny_core_bg.wasm",
+    "melodestiny_core.js",
+    "melodestiny_core.d.ts"
+  ],
+  "main": "melodestiny_core.js",
+  "types": "melodestiny_core.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
