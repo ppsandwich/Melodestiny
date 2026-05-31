@@ -20,8 +20,8 @@ const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-mono",
 });
 
-const syamsiah = localFont({
-  src: "../../public/fonts/SyamsiahArabic.ttf",
+const mustopha = localFont({
+  src: "../../public/fonts/Mustopha.ttf",
   variable: "--font-title",
 });
 
@@ -38,7 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${playfair.variable} ${lora.variable} ${ibmPlexMono.variable} ${syamsiah.variable} min-h-full flex flex-col`}
+        className={`${playfair.variable} ${lora.variable} ${ibmPlexMono.variable} ${mustopha.variable} min-h-full flex flex-col`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
