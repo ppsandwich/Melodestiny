@@ -24,11 +24,28 @@ export default function Home() {
   const [isEditorExpanded, setIsEditorExpanded] = useState(false);
   
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasTriggeredInitialAnalysis = useRef(false);
 
+  // Load saved title and lyrics on mount
   useEffect(() => {
-    // Initialize WASM
+    const savedTitle = localStorage.getItem("melodestiny_title") || "";
+    const savedLyrics = localStorage.getItem("melodestiny_lyrics") || "";
+    setTitle(savedTitle);
+    setLyrics(savedLyrics);
+  }, []);
+
+  // Initialize WASM
+  useEffect(() => {
     init().then(() => setWasmReady(true)).catch(console.error);
   }, []);
+
+  // Trigger initial analysis once WASM is ready and content is loaded
+  useEffect(() => {
+    if (wasmReady && title && lyrics && !hasTriggeredInitialAnalysis.current) {
+      hasTriggeredInitialAnalysis.current = true;
+      triggerAnalysis(title, lyrics);
+    }
+  }, [wasmReady, title, lyrics]);
 
   const triggerAnalysis = (currentTitle: string, currentLyrics: string) => {
     if (!wasmReady || !currentTitle || !currentLyrics) {
@@ -54,6 +71,7 @@ export default function Home() {
         // Only update if it actually changed to avoid cursor jumps
         if (newLyrics !== currentLyrics) {
           setLyrics(newLyrics);
+          localStorage.setItem("melodestiny_lyrics", newLyrics);
         }
         
         setResult(parsed);
@@ -68,6 +86,7 @@ export default function Home() {
   // Debounce the lyrics input by 2 seconds
   const handleLyricsChange = (newLyrics: string) => {
     setLyrics(newLyrics);
+    localStorage.setItem("melodestiny_lyrics", newLyrics);
     
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     
@@ -79,6 +98,7 @@ export default function Home() {
   // Also re-analyze if title changes (with debounce)
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
+    localStorage.setItem("melodestiny_title", newTitle);
     
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     
@@ -91,6 +111,8 @@ export default function Home() {
     const randomSong = demoSongs[Math.floor(Math.random() * demoSongs.length)];
     setTitle(randomSong.title);
     setLyrics(randomSong.lyrics);
+    localStorage.setItem("melodestiny_title", randomSong.title);
+    localStorage.setItem("melodestiny_lyrics", randomSong.lyrics);
     triggerAnalysis(randomSong.title, randomSong.lyrics);
   };
 
