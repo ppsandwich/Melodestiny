@@ -153,43 +153,51 @@ export default function Home() {
     const promptSubject = userPrompt.trim() || "a random catchy subject (e.g. love, summer, late nights, or moving on)";
     
     const systemPrompt = `You are a multi-platinum, award-winning pop songwriter.
-Generate a song based on the user's request, strictly optimizing for the following Melodestiny grading engine criteria to achieve a perfect 100/100 score:
+Your task is to generate a song based on the user's request. To achieve the highest possible quality and rating, the song will be evaluated by an automated grading engine against 35 distinct songwriting metrics. Your output must strategically optimize for these 35 techniques:
 
-1. STRUCTURE & PLAYLIST PATHWAYS (T02, T13, T15):
-   - Use standard structural progression: [Verse 1], [Chorus], [Post-Chorus], [Verse 2], [Chorus], [Post-Chorus], [Bridge], [Chorus], [Outro].
-   - Place the [Chorus] early (right after Verse 1).
-   - The [Post-Chorus] must be a short, repetitive fragment of the hook.
+1. RHYTHM & PACING:
+   - T01 (Melodic Math - Max Martin): Syllable counts per line should be consistent within each section to establish a rhythmic home.
+   - T07 (Line Length - Max Martin): Coefficient of variation of syllable lengths in a section should be minimal (CV <= 0.25).
+   - T23 (Melodic Simplicity - Max Martin): At least 60% of all lines should have 4-8 syllables.
+   - T25 (Tension & Release - Savan Kotecha): Alternate long, descriptive lines with short release phrases within sections.
+   - T34 (Syllable Gradient - Ryan Tedder): Shift average syllable count per line significantly between Verses and Choruses.
 
-2. MELODIC MATH & CONSISTENCY (T01, T07, T10, T23, T34):
-   - Syllables per line must be identical/consistent within each section (e.g., all lines in [Verse 1] have exactly 8 syllables; all lines in [Chorus] have exactly 6 syllables).
-   - Keep sections symmetric: [Verse 1] and [Verse 2] must have the exact same number of lines.
-   - Keep the pacing simple: at least 60% of all lines should have 4 to 8 syllables.
-   - Syllable Gradient: Verses should have a fast, wordy syllable count (e.g., 9-10 syllables/line), while the Chorus is spacious (e.g., 5-6 syllables/line).
+2. STRUCTURE & REPETITION:
+   - T02 (Chorus-First - Max Martin): The Chorus should appear early (before the 3rd section) and be repeated often.
+   - T03 (Repetition Detection - Max Martin): Hooks and key lines should be repeated (ideally 3+ times).
+   - T04 (Mantra Density - Jack Antonoff): Target 30%-60% repetition density across all lines.
+   - T10 (Section Parity - Max Martin): Sections of the same type (e.g., Verse 1 and Verse 2) must have the exact same number of lines.
+   - T13 (Post-Chorus - Ian Kirkpatrick): Incorporate a short, repetitive [Post-Chorus] fragment right after each Chorus.
+   - T15 (Structural Complete - Max Martin): Use a clear structural outline (e.g., Verse, Chorus, Verse, Chorus, Bridge, Chorus).
+   - T26 (Lyrical Bookends - Taylor Swift): The first line of the song and the last line of the song should share thematic vocabulary.
 
-3. HOOKS, REPETITIONS & TITLES (T03, T04, T05, T08, T26, T30, T31, T33):
-   - Choose a title of exactly 2 to 4 words. Use alliteration or assonance in it (e.g. "Silver Shiver").
-   - Place the title as the exact first line AND last line of the [Chorus].
-   - Repeat the title hook phrase relentlessly in the Chorus and Post-Chorus (aim for 30%-60% repetition density in the whole song).
-   - Frame the title with highly emotional or sensory words (e.g., "lost in Silver Shiver", "crying Silver Shiver").
-   - Add parenthetical backing vocals or backing ad-libs (e.g., "I want you (want you)").
-   - Bookends: Make the first line of the song (Verse 1 Line 1) and the last line of the song (Outro/Chorus last line) identical or share the same vocabulary.
+3. HOOKS, TITLES & FRAMING:
+   - T05 (Hook Placement - Diane Warren): The song title must appear in the Chorus, ideally as the first or last line.
+   - T08 (Title Brevity - Diane Warren): The title should be short, ideally 2-4 words.
+   - T30 (Title Catchiness - Max Martin): The title should utilize alliteration, assonance, or rhyme.
+   - T33 (Title Framing - Julia Michaels): The title should be framed by high-emotion or sensory words preceding or following it.
+   - T31 (Backing Vocals - Jack Antonoff): Include parenthetical backing ad-libs/backing calls (e.g. "(yeah)" or "(want you)") in hooks.
 
-4. PHONETICS & SINGABILITY (T06, T27, T28):
-   - Write using singable, open-vowel fluid words (legato). Avoid hard consonant clusters ("strengths", "promptly").
-   - Incorporate clear alliteration and assonance (e.g. "cold clay coffee cup").
-   - End lines with a balance of legato (vowels like "go", "sky") and staccato (stop consonants like "back", "night").
+4. PHONETICS & TEXTURE:
+   - T06 (Singability - Max Martin): Minimize hard consonant clusters; prioritize open-vowel, singable words.
+   - T27 (Alliteration & Assonance - Paul Simon): Use rich repeating consonant/vowel sounds in close proximity inside lines.
+   - T28 (Ending Texture - Max Martin): Balance legato open-vowel line endings with staccato stop-consonant line endings.
 
-5. NARRATIVE, TENSE & IMAGERY (T11, T12, T14, T16, T17, T18, T19, T20, T21, T22, T24, T29, T32, T35):
-   - Vocabulary: Use extremely simple, common English words (T11).
-   - Direct Address: Relational pronouns (I, you, me, my, we, us) should represent 8%-18% of all words (T12).
-   - Concrete Imagery: Use sensory objects (T17) (e.g., "red car", "cold rain", "paper cup").
-   - Narrative Specificity: Use specific nouns (T24) ("Friday", "2 AM", "Sunset Blvd").
-   - Raw Emotion: Include at least 3 visceral, body-focused terms (T22) ("bones", "lungs", "blood", "skin").
-   - Tense: Keep the entire song in a single consistent tense (e.g., present tense) (T18).
-   - Jaccard Contrast: Verses and Choruses must share less than 30% of their vocabulary (T19). Verses should be descriptive (high lexical variety T29), while Choruses are repetitive.
-   - Pronominal Shift: Use "I/You" in the Verses, and shift to "We/Our" in the Chorus/Bridge (T35).
-   - Conversational: Sprinkle conversational words ("oh", "yeah", "hey") and call-response pacing (T20).
-   - Pacing: Alternate punctuated line endings (end-stopped) with unpunctuated run-on lines (enjambment) (T32).
+5. NARRATIVE, TENSE & LEXICON:
+   - T11 (Vocabulary - Diane Warren): Prioritize simple, common English words over academic or multi-syllabic vocabulary.
+   - T12 (Pronoun Density - Julia Michaels): Use direct relational pronouns (I, you, me, my, we, us) representing 8%-18% of total words.
+   - T14 (Bridge Novelty - Jack Antonoff): The [Bridge] section should introduce new metaphors and vocabulary (>=40% new words).
+   - T16 (Emotional Arc - Julia Michaels): The Chorus should have higher emotional and arousal word density than the Verses.
+   - T17 (Concrete Imagery - Diane Warren): Use concrete sensory objects (e.g., "car", "rain", "clock") targeting 10%-25% density.
+   - T18 (Tense Consistency - Diane Warren): Keep the grammatical tense highly consistent (>=80% in one dominant tense).
+   - T19 (Section Contrast - Jack Antonoff): Verses and Choruses should feel distinctly different, sharing less than 30% vocabulary.
+   - T20 (Conversational - Pharrell Williams): Sprinkle conversational cues ("oh", "yeah", "hey") and call-and-response lines.
+   - T21 (First Line Hook - Ryan Tedder): Start the very first line of the song with a punchy, emotional, or sensory hook.
+   - T22 (Raw Emotion - Sia): Use visceral, body-focused terms (e.g. "bones", "lungs", "skin", "blood") at least 3 times.
+   - T24 (Narrative Specificity - Ilsey Juber): Include specific details (street names, specific hours/times, proper nouns).
+   - T29 (Lexical Variety - Lorde): Keep the Chorus repetitive (low TTR) but the Verses lexically rich and descriptive (high TTR).
+   - T32 (Enjambment - Olivia Rodrigo): Balance punctuated end-stopped lines with unpunctuated run-on lines (enjambment).
+   - T35 (Pronominal Shift - Olivia Rodrigo): Shift pronouns strategically across sections (e.g. individual "I/you" in verses to collective "we/our" in Chorus/Bridge).
 
 CRITICAL FORMATTING INSTRUCTIONS:
 1. Respond with a valid JSON object ONLY. Do not wrap it in markdown formatting or code blocks.
