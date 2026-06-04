@@ -263,6 +263,154 @@ function process_analysis_in_js(input_json_str, raw_result_str) {
         });
     }
 
+    // Auto-partition song structure if no explicit section headers are present
+    function hasExplicitSections(lines) {
+        return lines.some(line => {
+            const t = line.text.trim();
+            return t.startsWith('[') || t.startsWith('{');
+        });
+    }
+
+    if (data.highlighted_lyrics && Array.isArray(data.highlighted_lyrics) && !hasExplicitSections(data.highlighted_lyrics)) {
+        data.auto_partitioned = true;
+        
+        const blocks = [];
+        let currentBlock = [];
+        data.highlighted_lyrics.forEach((line) => {
+            const trimmed = line.text.trim();
+            if (trimmed.length === 0) {
+                if (currentBlock.length > 0) {
+                    blocks.push(currentBlock);
+                    currentBlock = [];
+                }
+            } else {
+                currentBlock.push(line);
+            }
+        });
+        if (currentBlock.length > 0) {
+            blocks.push(currentBlock);
+        }
+        
+        const N = blocks.length;
+        if (N > 0) {
+            const blockJaccard = (b1, b2) => {
+                const getWords = (block) => {
+                    return block.map(l => l.text.toLowerCase().split(/\s+/)).flat()
+                        .map(w => w.replace(/[^a-zA-Z]/g, ""))
+                        .filter(w => w.length > 0);
+                };
+                const w1 = getWords(b1);
+                const w2 = getWords(b2);
+                const s1 = new Set(w1);
+                const s2 = new Set(w2);
+                if (s1.size === 0 && s2.size === 0) return 1.0;
+                if (s1.size === 0 || s2.size === 0) return 0.0;
+                let intersect = 0;
+                s1.forEach(w => {
+                    if (s2.has(w)) intersect++;
+                });
+                return intersect / (s1.size + s2.size - intersect);
+            };
+            
+            const matches = Array(N).fill(0).map(() => []);
+            for (let i = 0; i < N; i++) {
+                for (let j = 0; j < N; j++) {
+                    if (i !== j && blockJaccard(blocks[i], blocks[j]) >= 0.55) {
+                        matches[i].push(j);
+                    }
+                }
+            }
+            
+            const clusters = [];
+            const visited = new Set();
+            for (let i = 0; i < N; i++) {
+                if (visited.has(i)) continue;
+                if (matches[i].length > 0) {
+                    const cluster = [i, ...matches[i]];
+                    cluster.forEach(idx => visited.add(idx));
+                    clusters.push(cluster);
+                }
+            }
+            
+            clusters.sort((c1, c2) => c2.length - c1.length);
+            const chorusIndices = new Set(clusters[0] || []);
+            
+            const preChorusIndices = new Set();
+            if (clusters.length > 1) {
+                const cand = clusters[1];
+                let alwaysPrecedes = true;
+                cand.forEach(idx => {
+                    if (idx + 1 >= N || !chorusIndices.has(idx + 1)) {
+                        alwaysPrecedes = false;
+                    }
+                });
+                if (alwaysPrecedes) {
+                    cand.forEach(idx => preChorusIndices.add(idx));
+                }
+            }
+            
+            const labels = Array(N).fill(null);
+            if (N === 1) {
+                labels[0] = "Verse 1";
+            } else {
+                for (let i = 0; i < N; i++) {
+                    if (chorusIndices.has(i)) {
+                        labels[i] = "Chorus";
+                    } else if (preChorusIndices.has(i)) {
+                        labels[i] = "Pre-Chorus";
+                    }
+                }
+                
+                let verseCounter = 0;
+                for (let i = 0; i < N; i++) {
+                    if (labels[i] !== null) continue;
+                    
+                    if (i === 0 && blocks[i].length <= 3) {
+                        labels[i] = "Intro";
+                    } else if (i === N - 1 && (blocks[i].length <= 3 || (clusters[0] && blockJaccard(blocks[i], blocks[clusters[0][0]]) >= 0.25))) {
+                        labels[i] = "Outro";
+                    } else {
+                        let isBridge = false;
+                        if (N >= 4 && i > 0 && i < N - 1) {
+                            let chorusCountBefore = 0;
+                            for (let k = 0; k < i; k++) {
+                                if (labels[k] === "Chorus") chorusCountBefore++;
+                            }
+                            if (chorusCountBefore >= 2) {
+                                isBridge = true;
+                            }
+                        }
+                        
+                        if (isBridge) {
+                            labels[i] = "Bridge";
+                        } else {
+                            verseCounter++;
+                            labels[i] = `Verse ${verseCounter}`;
+                        }
+                    }
+                }
+            }
+            
+            blocks.forEach((block, blockIdx) => {
+                const label = labels[blockIdx];
+                block.forEach(line => {
+                    line.section = label;
+                });
+            });
+            
+            let currentLabel = null;
+            data.highlighted_lyrics.forEach(line => {
+                if (line.section) {
+                    currentLabel = line.section;
+                } else {
+                    line.section = currentLabel;
+                }
+            });
+        }
+    } else {
+        data.auto_partitioned = false;
+    }
+
     // Update existing technique flags based on new line numbering
     if (data.techniques && Array.isArray(data.techniques)) {
         data.techniques.forEach(t => {

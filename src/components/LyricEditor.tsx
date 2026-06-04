@@ -43,16 +43,17 @@ export function LyricEditor({ value, onChange, lines, isAnalyzing }: LyricEditor
           {lines ? (
             lines.map((line, idx) => {
               const textWithDots = line.syllabified_words ? line.syllabified_words.join(' ') : line.text;
-              
-              // We render the exact text to maintain spacing, but the text is transparent.
-              // We render the pill absolutely positioned to the right of the container.
-              // Wait! If the container is absolute inset-0, we can't reliably position a pill "at the end of the line" unless we make the line a flex container.
-              // But if we make it a flex container, white-space: pre-wrap on newlines might break alignment with the textarea.
-              // The safest way is to let the text flow exactly like the textarea, and attach the pill via float or flex.
-              // Since the background text exactly matches the textarea text, we can just render block divs for each line!
-              // BUT textarea lines wrap naturally. A block div wrapping naturally perfectly mimics a textarea!
+              const prevLine = idx > 0 ? lines[idx - 1] : null;
+              const sectionChanged = line.section && (!prevLine || prevLine.section !== line.section);
+              const showSectionLabel = sectionChanged && !line.text.trim().startsWith('[') && !line.text.trim().startsWith('{');
+
               return (
                 <div key={idx} className="relative min-h-[1.5em] group">
+                  {showSectionLabel && (
+                    <div className="absolute bottom-full left-0 mb-0.5 font-display text-[10px] text-gold/80 uppercase tracking-widest font-bold select-none pointer-events-none">
+                      [{line.section}]
+                    </div>
+                  )}
                   <span className="text-transparent selection:bg-transparent">
                     {textWithDots || ' '}
                   </span>

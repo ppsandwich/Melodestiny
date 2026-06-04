@@ -35,6 +35,11 @@ pub fn analyze_input(input: &AnalysisInput) -> AnalysisOutput {
         });
     }
 
+    let has_explicit = has_explicit_sections(&lines);
+    if !has_explicit {
+        auto_partition(&mut lines);
+    }
+
     let mut techniques = Vec::new();
     
     // T01 Melodic Math
@@ -204,6 +209,189 @@ pub fn analyze_input(input: &AnalysisInput) -> AnalysisOutput {
         techniques,
         highlighted_lyrics: lines,
         markup_download: String::new(),
-        auto_partitioned: false,
+        auto_partitioned: !has_explicit,
+    }
+}
+
+fn has_explicit_sections(lines: &[LyricLine]) -> bool {
+    lines.iter().any(|line| {
+        let t = line.text.trim();
+        t.starts_with('[') || t.starts_with('{')
+    })
+}
+
+fn auto_partition(lines: &mut [LyricLine]) {
+    // 1. Group lines into blocks of indices
+    let mut blocks: Vec<Vec<usize>> = Vec::new();
+    let mut current_block = Vec::new();
+    
+    for (idx, line) in lines.iter().enumerate() {
+        let trimmed = line.text.trim();
+        if trimmed.is_empty() {
+            if !current_block.is_empty() {
+                blocks.push(current_block);
+                current_block = Vec::new();
+            }
+        } else {
+            current_block.push(idx);
+        }
+    }
+    if !current_block.is_empty() {
+        blocks.push(current_block);
+    }
+    
+    let n = blocks.len();
+    if n == 0 {
+        return;
+    }
+    
+    let mut labels = vec![None; n];
+    
+    if n == 1 {
+        labels[0] = Some("Verse 1".to_string());
+    } else {
+        // Helper to get words in a block
+        let get_words = |block_indices: &[usize], lines_ref: &[LyricLine]| -> std::collections::HashSet<String> {
+            let mut words = std::collections::HashSet::new();
+            for &idx in block_indices {
+                for word in lines_ref[idx].text.split_whitespace() {
+                    let clean: String = word.chars().filter(|c| c.is_alphabetic()).collect();
+                    let lower = clean.to_lowercase();
+                    if !lower.is_empty() {
+                        words.insert(lower);
+                    }
+                }
+            }
+            words
+        };
+        
+        // Helper to calculate block Jaccard
+        let block_jaccard = |b1: &[usize], b2: &[usize], lines_ref: &[LyricLine]| -> f64 {
+            let s1 = get_words(b1, lines_ref);
+            let s2 = get_words(b2, lines_ref);
+            if s1.is_empty() && s2.is_empty() {
+                return 1.0;
+            }
+            if s1.is_empty() || s2.is_empty() {
+                return 0.0;
+            }
+            let intersect = s1.intersection(&s2).count() as f64;
+            let union = (s1.len() + s2.len()) as f64 - intersect;
+            intersect / union
+        };
+        
+        // Compute matches
+        let mut matches = vec![Vec::new(); n];
+        for i in 0..n {
+            for j in 0..n {
+                if i != j && block_jaccard(&blocks[i], &blocks[j], lines) >= 0.55 {
+                    matches[i].push(j);
+                }
+            }
+        }
+        
+        // Find repeated clusters
+        let mut clusters: Vec<Vec<usize>> = Vec::new();
+        let mut visited = std::collections::HashSet::new();
+        for i in 0..n {
+            if visited.contains(&i) {
+                continue;
+            }
+            if !matches[i].is_empty() {
+                let mut cluster = vec![i];
+                cluster.extend(&matches[i]);
+                for &idx in &cluster {
+                    visited.insert(idx);
+                }
+                clusters.push(cluster);
+            }
+        }
+        
+        // Sort clusters by size desc
+        clusters.sort_by(|c1, c2| c2.len().cmp(&c1.len()));
+        
+        let mut chorus_indices = std::collections::HashSet::new();
+        if !clusters.is_empty() {
+            for &idx in &clusters[0] {
+                chorus_indices.insert(idx);
+            }
+        }
+        
+        let mut pre_chorus_indices = std::collections::HashSet::new();
+        if clusters.len() > 1 {
+            let cand = &clusters[1];
+            let mut always_precedes = true;
+            for &idx in cand {
+                if idx + 1 >= n || !chorus_indices.contains(&(idx + 1)) {
+                    always_precedes = false;
+                    break;
+                }
+            }
+            if always_precedes {
+                for &idx in cand {
+                    pre_chorus_indices.insert(idx);
+                }
+            }
+        }
+        
+        for i in 0..n {
+            if chorus_indices.contains(&i) {
+                labels[i] = Some("Chorus".to_string());
+            } else if pre_chorus_indices.contains(&i) {
+                labels[i] = Some("Pre-Chorus".to_string());
+            }
+        }
+        
+        let mut verse_counter = 0;
+        for i in 0..n {
+            if labels[i].is_some() {
+                continue;
+            }
+            
+            if i == 0 && blocks[i].len() <= 3 {
+                labels[i] = Some("Intro".to_string());
+            } else if i == n - 1 && (blocks[i].len() <= 3 || (!clusters.is_empty() && block_jaccard(&blocks[i], &blocks[clusters[0][0]], lines) >= 0.25)) {
+                labels[i] = Some("Outro".to_string());
+            } else {
+                let mut is_bridge = false;
+                if n >= 4 && i > 0 && i < n - 1 {
+                    let mut chorus_count_before = 0;
+                    for k in 0..i {
+                        if labels[k] == Some("Chorus".to_string()) {
+                            chorus_count_before += 1;
+                        }
+                    }
+                    if chorus_count_before >= 2 {
+                        is_bridge = true;
+                    }
+                }
+                
+                if is_bridge {
+                    labels[i] = Some("Bridge".to_string());
+                } else {
+                    verse_counter += 1;
+                    labels[i] = Some(format!("Verse {}", verse_counter));
+                }
+            }
+        }
+    }
+    
+    // Assign sections to lines in blocks
+    for (block_idx, block) in blocks.iter().enumerate() {
+        if let Some(ref label) = labels[block_idx] {
+            for &idx in block {
+                lines[idx].section = Some(label.clone());
+            }
+        }
+    }
+    
+    // Propagate section label to blank lines
+    let mut current_label = None;
+    for line in lines.iter_mut() {
+        if line.section.is_some() {
+            current_label = line.section.clone();
+        } else {
+            line.section = current_label.clone();
+        }
     }
 }

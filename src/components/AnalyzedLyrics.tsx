@@ -19,7 +19,7 @@ export function AnalyzedLyrics({ lines }: { lines: LyricLine[] }) {
 
           return (
             <div key={idx} className="flex flex-col">
-              {sectionChanged && (
+              {sectionChanged && !line.text.trim().startsWith('[') && !line.text.trim().startsWith('{') && (
                 <div className="mt-6 mb-2 font-display text-gold uppercase tracking-widest text-sm font-bold border-b border-subtle/30 pb-1">
                   [{line.section}]
                 </div>
