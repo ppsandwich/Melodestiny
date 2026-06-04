@@ -12,7 +12,7 @@ import { processSyllables } from "@/app/actions";
 import { demoSongs } from "@/lib/demoSongs";
 import { useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenFancy, faChevronDown, faChevronUp, faUndo, faKey } from "@fortawesome/free-solid-svg-icons";
+import { faPenFancy, faChevronDown, faChevronUp, faUndo, faKey, faSave, faFolderOpen, faTrash, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Home() {
@@ -30,6 +30,10 @@ export default function Home() {
 
   // State for last generated prompt to support regeneration
   const [lastPrompt, setLastPrompt] = useState("");
+
+  const [isSaveSuccess, setIsSaveSuccess] = useState(false);
+  const [showLibraryPopover, setShowLibraryPopover] = useState(false);
+  const [savedSongsList, setSavedSongsList] = useState<any[]>([]);
   
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasTriggeredInitialAnalysis = useRef(false);
@@ -48,6 +52,13 @@ export default function Home() {
 
     const savedPrompt = localStorage.getItem("melodestiny_last_prompt") || "";
     setLastPrompt(savedPrompt);
+
+    const savedSongsStr = localStorage.getItem("melodestiny_saved_songs") || "[]";
+    try {
+      setSavedSongsList(JSON.parse(savedSongsStr));
+    } catch (e) {
+      setSavedSongsList([]);
+    }
   }, []);
 
   // Initialize WASM
@@ -253,6 +264,89 @@ CRITICAL FORMATTING INSTRUCTIONS:
     setResult(null);
   };
 
+  const handleSaveSong = () => {
+    if (!title.trim() && !lyrics.trim()) {
+      alert("Cannot save an empty song. Please enter a title or lyrics first.");
+      return;
+    }
+
+    const songTitle = title.trim() || "Untitled Song";
+    const savedSongsStr = localStorage.getItem("melodestiny_saved_songs") || "[]";
+    let songs: any[] = [];
+    try {
+      songs = JSON.parse(savedSongsStr);
+    } catch (e) {
+      songs = [];
+    }
+
+    // Check if song with same title exists
+    const existingIndex = songs.findIndex(s => s.title.toLowerCase() === songTitle.toLowerCase());
+    
+    const newSong = {
+      id: existingIndex >= 0 ? songs[existingIndex].id : Date.now().toString(),
+      title: songTitle,
+      lyrics: lyrics,
+      savedAt: new Date().toISOString()
+    };
+
+    if (existingIndex >= 0) {
+      const confirmOverwrite = window.confirm(`A song with the title "${songTitle}" already exists. Do you want to overwrite it?`);
+      if (!confirmOverwrite) {
+        return;
+      }
+      songs[existingIndex] = newSong;
+    } else {
+      songs.push(newSong);
+    }
+
+    localStorage.setItem("melodestiny_saved_songs", JSON.stringify(songs));
+    setSavedSongsList(songs);
+
+    setIsSaveSuccess(true);
+    setTimeout(() => {
+      setIsSaveSuccess(false);
+    }, 1500);
+  };
+
+  const handleRestoreSong = (song: any) => {
+    if (lyrics.trim().length > 0) {
+      const isDifferent = title !== song.title || lyrics !== song.lyrics;
+      if (isDifferent) {
+        const confirmRestore = window.confirm(
+          "Warning: Restoring this song will overwrite your current work in the editor. Any unsaved edits will be lost. Proceed?"
+        );
+        if (!confirmRestore) {
+          return;
+        }
+      }
+    }
+
+    setTitle(song.title);
+    setLyrics(song.lyrics);
+    localStorage.setItem("melodestiny_title", song.title);
+    localStorage.setItem("melodestiny_lyrics", song.lyrics);
+
+    triggerAnalysis(song.title, song.lyrics);
+    setShowLibraryPopover(false);
+  };
+
+  const handleDeleteSavedSong = (id: string) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this song from your library?");
+    if (!confirmDelete) return;
+
+    const savedSongsStr = localStorage.getItem("melodestiny_saved_songs") || "[]";
+    let songs: any[] = [];
+    try {
+      songs = JSON.parse(savedSongsStr);
+    } catch (e) {
+      songs = [];
+    }
+
+    const filtered = songs.filter(s => s.id !== id);
+    localStorage.setItem("melodestiny_saved_songs", JSON.stringify(filtered));
+    setSavedSongsList(filtered);
+  };
+
   const handleExportLyrics = () => {
     const cleanLyrics = lyrics.replace(/·/g, '');
     const blob = new Blob([cleanLyrics], { type: "text/plain;charset=utf-8" });
@@ -334,6 +428,67 @@ CRITICAL FORMATTING INSTRUCTIONS:
                     >
                       Save Configuration
                     </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Save Button */}
+              <button
+                onClick={handleSaveSong}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-cream shadow-card border border-subtle text-sepia hover:text-gold transition-colors focus:outline-none cursor-pointer"
+                aria-label="Save current song"
+                title="Save Current Song"
+              >
+                <FontAwesomeIcon icon={isSaveSuccess ? faCheck : faSave} className={`text-sm ${isSaveSuccess ? 'text-sage' : ''}`} />
+              </button>
+
+              {/* Restore Library Button */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowLibraryPopover(!showLibraryPopover)}
+                  className={`flex items-center justify-center w-10 h-10 rounded-full bg-cream shadow-card border transition-colors focus:outline-none cursor-pointer ${
+                    showLibraryPopover ? 'border-gold text-gold' : 'border-subtle text-sepia hover:text-gold'
+                  }`}
+                  aria-label="Open Saved Songs Library"
+                  title="Saved Songs Library"
+                >
+                  <FontAwesomeIcon icon={faFolderOpen} className="text-sm" />
+                </button>
+                
+                {showLibraryPopover && (
+                  <div className="absolute right-0 mt-2 bg-cream border border-subtle rounded-md shadow-lg p-4 w-72 z-50 flex flex-col gap-3.5 text-left text-ink">
+                    <h4 className="font-display font-semibold text-sm border-b border-subtle/50 pb-1.5 text-gold uppercase tracking-wider">
+                      Saved Songs
+                    </h4>
+                    {savedSongsList.length === 0 ? (
+                      <p className="font-body text-xs text-sepia/70 italic py-2">
+                        No saved songs in library.
+                      </p>
+                    ) : (
+                      <ul className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-1">
+                        {savedSongsList.map((song) => (
+                          <li key={song.id} className="flex justify-between items-center gap-2 p-1.5 rounded hover:bg-parchment/30 transition-colors group">
+                            <button
+                              onClick={() => handleRestoreSong(song)}
+                              className="flex-1 text-left text-xs font-body font-medium hover:text-gold transition-colors truncate cursor-pointer pr-1"
+                              title={`Restore: ${song.title}`}
+                            >
+                              {song.title || "Untitled Song"}
+                              <span className="block text-[9px] text-sepia/55 font-mono">
+                                {new Date(song.savedAt).toLocaleDateString()}
+                              </span>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteSavedSong(song.id)}
+                              className="text-sepia/50 hover:text-rust opacity-0 group-hover:opacity-100 transition-all cursor-pointer p-1"
+                              title="Delete song"
+                            >
+                              <FontAwesomeIcon icon={faTrash} className="text-[10px]" />
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 )}
               </div>
