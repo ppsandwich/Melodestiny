@@ -37,7 +37,7 @@ export function LyricEditor({ value, onChange, lines, isAnalyzing }: LyricEditor
         {/* Background Render Layer (Visuals) */}
         <div 
           ref={bgRef}
-          className="absolute inset-0 p-6 overflow-hidden pointer-events-none whitespace-pre-wrap break-words text-transparent"
+          className="absolute inset-0 pt-6 pb-6 pr-6 pl-14 overflow-hidden pointer-events-none whitespace-pre-wrap break-words text-transparent"
           aria-hidden="true"
         >
           {lines ? (
@@ -52,6 +52,11 @@ export function LyricEditor({ value, onChange, lines, isAnalyzing }: LyricEditor
                   {showSectionLabel && (
                     <div className="absolute bottom-full left-0 mb-0.5 font-display text-[10px] text-gold/80 uppercase tracking-widest font-bold select-none pointer-events-none">
                       [{line.section}]
+                    </div>
+                  )}
+                  {line.line_number > 0 && (
+                    <div className="absolute left-[-2.25rem] top-0 text-sepia/40 font-mono text-xs select-none w-8 text-right">
+                      {line.line_number}
                     </div>
                   )}
                   <span className="text-transparent selection:bg-transparent">
@@ -124,7 +129,7 @@ export function LyricEditor({ value, onChange, lines, isAnalyzing }: LyricEditor
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onScroll={handleScroll}
-          className="absolute inset-0 w-full h-full p-6 bg-transparent text-ink caret-ink resize-none outline-none whitespace-pre-wrap break-words z-10"
+          className="absolute inset-0 w-full h-full pt-6 pb-6 pr-6 pl-14 bg-transparent text-ink caret-ink resize-none outline-none whitespace-pre-wrap break-words z-10"
           placeholder="Paste your lyrics here...&#10;&#10;[Verse 1]&#10;Nice to meet you, where you been?&#10;I could show you in·cred·i·ble things..."
           spellCheck={false}
         />
