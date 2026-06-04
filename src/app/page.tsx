@@ -9,6 +9,7 @@ import { TechniqueScoresCard } from "@/components/TechniqueScoresCard";
 import { ScoreBreakdown } from "@/components/ScoreBreakdown";
 import { LyricEditor } from "@/components/LyricEditor";
 import { processSyllables } from "@/app/actions";
+import { demoSongs } from "@/lib/demoSongs";
 import { useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenFancy, faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
@@ -86,6 +87,13 @@ export default function Home() {
     }, 2000);
   };
 
+  const handleLoadDemo = () => {
+    const randomSong = demoSongs[Math.floor(Math.random() * demoSongs.length)];
+    setTitle(randomSong.title);
+    setLyrics(randomSong.lyrics);
+    triggerAnalysis(randomSong.title, randomSong.lyrics);
+  };
+
   return (
     <div className="min-h-screen p-4 md:p-8 flex justify-center w-full overflow-hidden">
       <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-[1fr_400px] xl:grid-cols-[1fr_500px] gap-8 min-w-0 mt-[30px]">
@@ -141,6 +149,7 @@ export default function Home() {
                 onChange={handleLyricsChange} 
                 lines={result?.highlighted_lyrics || null}
                 isAnalyzing={isAnalyzing}
+                onLoadDemo={handleLoadDemo}
               />
               
               <div className="text-sm text-sepia/60 italic mt-2 text-right">

@@ -8,9 +8,10 @@ interface LyricEditorProps {
   onChange: (val: string) => void;
   lines: LyricLine[] | null;
   isAnalyzing: boolean;
+  onLoadDemo?: () => void;
 }
 
-export function LyricEditor({ value, onChange, lines, isAnalyzing }: LyricEditorProps) {
+export function LyricEditor({ value, onChange, lines, isAnalyzing, onLoadDemo }: LyricEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
 
@@ -28,6 +29,18 @@ export function LyricEditor({ value, onChange, lines, isAnalyzing }: LyricEditor
       {isAnalyzing && (
         <div className="absolute top-2 right-4 z-20 text-xs font-bold text-gold uppercase tracking-widest animate-pulse">
           Analyzing...
+        </div>
+      )}
+
+      {/* Demo Button overlay when blank */}
+      {!value.trim() && onLoadDemo && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+          <button
+            onClick={onLoadDemo}
+            className="pointer-events-auto px-6 py-3 rounded-full bg-gold/10 hover:bg-gold/25 text-gold border border-gold/30 hover:border-gold transition-all duration-300 font-display font-medium text-sm tracking-wider uppercase shadow-lg flex items-center gap-2 cursor-pointer backdrop-blur-xs"
+          >
+            ✨ Load Demo Song
+          </button>
         </div>
       )}
       
