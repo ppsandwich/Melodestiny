@@ -17,6 +17,53 @@ function process_analysis_in_js(input_json_str, raw_result_str) {
         return raw_result_str;
     }
 
+    // Re-index lines and build mapping of old line numbers to new ones
+    const oldToNew = {};
+    let newLineNum = 0;
+    const generalTechniques = new Set([
+        "T02", "T03", "T04", "T05", "T08", "T09", "T10", "T13", "T15", "T16", "T18", "T19", "T25", "T28", "T29", "T30", "T34", "T35"
+    ]);
+
+    if (data.highlighted_lyrics && Array.isArray(data.highlighted_lyrics)) {
+        data.highlighted_lyrics.forEach((line, idx) => {
+            const oldLineNum = line.line_number || (idx + 1);
+            const trimmed = line.text.trim();
+            const is_empty = trimmed.length === 0;
+            const is_header = trimmed.startsWith('[') || trimmed.startsWith('{');
+            
+            if (is_empty || is_header) {
+                line.line_number = 0;
+                line.syllables = 0;
+                oldToNew[oldLineNum] = 0;
+            } else {
+                newLineNum++;
+                line.line_number = newLineNum;
+                oldToNew[oldLineNum] = newLineNum;
+            }
+        });
+    }
+
+    // Update existing technique flags based on new line numbering
+    if (data.techniques && Array.isArray(data.techniques)) {
+        data.techniques.forEach(t => {
+            if (t.flags && Array.isArray(t.flags)) {
+                t.flags = t.flags.map(f => {
+                    const oldL = f.line_number;
+                    let newL = oldToNew[oldL];
+                    if (newL === undefined || newL === 0) {
+                        if (generalTechniques.has(t.id)) {
+                            newL = 1; // general flags fallback to Line 1
+                        } else {
+                            newL = 0; // filter out specific flags on empty/header lines
+                        }
+                    }
+                    f.line_number = newL;
+                    return f;
+                }).filter(f => f.line_number > 0);
+            }
+        });
+    }
+
     // 1. Assign groups to existing T01-T25
     data.techniques.forEach(t => {
         t.active = true;

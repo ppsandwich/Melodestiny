@@ -60,7 +60,7 @@ export function LyricEditor({ value, onChange, lines, isAnalyzing }: LyricEditor
                     <div className="pointer-events-none">
                       {/* We could render syntax highlighting here if we wanted! */}
                     </div>
-                    {line.text.trim() && (
+                    {line.text.trim() && !line.text.trim().startsWith('[') && !line.text.trim().startsWith('{') && (
                       <div className="flex-shrink-0 text-right pr-2">
                         <span className={`
                           inline-block font-mono text-[11px] px-2 py-0.5 rounded transition-opacity duration-500

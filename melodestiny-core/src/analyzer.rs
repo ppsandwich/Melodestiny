@@ -7,20 +7,26 @@ pub fn analyze_input(input: &AnalysisInput) -> AnalysisOutput {
     let mut lines = Vec::new();
     let mut current_section = None;
     
-    for (i, line) in input.lyrics.lines().enumerate() {
+    let mut line_counter = 0;
+    for line in input.lyrics.lines() {
         let text = line.trim();
         
         if let Some(sec) = detect_section(text) {
             current_section = Some(sec);
-            // We can decide to either include section labels as empty text or parse them out.
-            // The PRD says "Filters out section labels (lines matching section patterns)".
-            // For now, let's keep them with a special flag or just empty syllables.
         }
         
-        let syllables = count_line_syllables(text);
+        let is_empty = text.is_empty();
+        let is_header = text.starts_with('[') || text.starts_with('{');
+        
+        let (line_number, syllables) = if is_empty || is_header {
+            (0, 0)
+        } else {
+            line_counter += 1;
+            (line_counter, count_line_syllables(text))
+        };
         
         lines.push(LyricLine {
-            line_number: i + 1,
+            line_number,
             text: line.to_string(),
             annotations: vec![],
             syllables,

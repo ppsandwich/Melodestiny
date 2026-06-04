@@ -86,7 +86,7 @@ export function ScoreBreakdown({ techniques }: { techniques: TechniqueResult[] }
                   }).sort((a, b) => a.firstLine - b.firstLine);
 
                   const generalTechniques = new Set([
-                    "T02", "T05", "T08", "T09", "T10", "T15", "T16", "T18", "T19", "T25", "T29", "T30", "T34", "T35"
+                    "T02", "T03", "T04", "T05", "T08", "T09", "T10", "T13", "T15", "T16", "T18", "T19", "T25", "T28", "T29", "T30", "T34", "T35"
                   ]);
                   const isGeneral = generalTechniques.has(t.id);
 

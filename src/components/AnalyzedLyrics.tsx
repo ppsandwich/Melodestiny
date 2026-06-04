@@ -25,7 +25,7 @@ export function AnalyzedLyrics({ lines }: { lines: LyricLine[] }) {
               
               <div className="flex gap-4 group py-1 hover:bg-parchment/40 rounded transition-colors px-2 -mx-2 items-center">
                 <div className="w-8 flex-shrink-0 text-right text-sepia/40 font-mono text-xs select-none">
-                  {line.line_number}
+                  {line.line_number > 0 ? line.line_number : ""}
                 </div>
                 
                 <div className="flex-grow">
@@ -40,7 +40,7 @@ export function AnalyzedLyrics({ lines }: { lines: LyricLine[] }) {
                   )}
                 </div>
                 
-                {line.text.trim() !== "" && (
+                {line.text.trim() !== "" && !line.text.trim().startsWith('[') && !line.text.trim().startsWith('{') && (
                   <div className="flex-shrink-0 w-16 text-right">
                     <span className="inline-block bg-sepia/10 text-sepia font-mono text-xs px-2 py-1 rounded">
                       {line.syllables} syl
