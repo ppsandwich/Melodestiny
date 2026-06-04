@@ -5,11 +5,19 @@
  * @returns {string}
  */
 export function analyze(input_json) {
+    let cleaned_input_json = input_json;
+    try {
+        const parsed = JSON.parse(input_json);
+        if (parsed.lyrics) {
+            parsed.lyrics = parsed.lyrics.replace(/·/g, '');
+        }
+        cleaned_input_json = JSON.stringify(parsed);
+    } catch(e) {}
     let deferred2_0;
     let deferred2_1;
     let raw_result;
     try {
-        const ptr0 = passStringToWasm0(input_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const ptr0 = passStringToWasm0(cleaned_input_json, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
         const ret = wasm.analyze(ptr0, len0);
         deferred2_0 = ret[0];
@@ -18,7 +26,7 @@ export function analyze(input_json) {
     } finally {
         wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
     }
-    return process_analysis_in_js(input_json, raw_result);
+    return process_analysis_in_js(cleaned_input_json, raw_result);
 }
 function __wbg_get_imports() {
     const import0 = {
@@ -363,6 +371,31 @@ function process_analysis_in_js(input_json_str, raw_result_str) {
     });
 
     data.total_score = active_weight_sum > 0 ? (active_weighted_sum / active_weight_sum) : 0;
+
+    // 5. Populate lines with their associated active feedback flags
+    if (data.highlighted_lyrics && Array.isArray(data.highlighted_lyrics)) {
+        data.highlighted_lyrics.forEach(line => {
+            line.flags = [];
+        });
+
+        data.techniques.forEach(t => {
+            if (t.active && t.flags && Array.isArray(t.flags)) {
+                t.flags.forEach(f => {
+                    if (f.line_number > 0 && !generalTechniques.has(t.id)) {
+                        const targetLine = data.highlighted_lyrics.find(l => l.line_number === f.line_number);
+                        if (targetLine) {
+                            targetLine.flags.push({
+                                technique_id: t.id,
+                                technique_name: t.name,
+                                type_: f.type_,
+                                message: f.message
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    }
 
     return JSON.stringify(data);
 }

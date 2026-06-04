@@ -4,11 +4,12 @@ use crate::section::detect_section;
 use crate::techniques::{t01_melodic_math, t08_title_brevity};
 
 pub fn analyze_input(input: &AnalysisInput) -> AnalysisOutput {
+    let clean_lyrics = input.lyrics.replace('·', "");
     let mut lines = Vec::new();
     let mut current_section = None;
     
     let mut line_counter = 0;
-    for line in input.lyrics.lines() {
+    for line in clean_lyrics.lines() {
         let text = line.trim();
         
         if let Some(sec) = detect_section(text) {

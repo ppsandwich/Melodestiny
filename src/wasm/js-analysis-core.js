@@ -152,6 +152,31 @@ function process_analysis_in_js(input_json_str, raw_result_str) {
 
     data.total_score = active_weight_sum > 0 ? (active_weighted_sum / active_weight_sum) : 0;
 
+    // 5. Populate lines with their associated active feedback flags
+    if (data.highlighted_lyrics && Array.isArray(data.highlighted_lyrics)) {
+        data.highlighted_lyrics.forEach(line => {
+            line.flags = [];
+        });
+
+        data.techniques.forEach(t => {
+            if (t.active && t.flags && Array.isArray(t.flags)) {
+                t.flags.forEach(f => {
+                    if (f.line_number > 0 && !generalTechniques.has(t.id)) {
+                        const targetLine = data.highlighted_lyrics.find(l => l.line_number === f.line_number);
+                        if (targetLine) {
+                            targetLine.flags.push({
+                                technique_id: t.id,
+                                technique_name: t.name,
+                                type_: f.type_,
+                                message: f.message
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    }
+
     return JSON.stringify(data);
 }
 

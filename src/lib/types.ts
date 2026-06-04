@@ -32,6 +32,14 @@ export interface LyricLine {
   syllables: number;
   section: string | null;
   syllabified_words?: string[];
+  flags?: AssociatedFlag[];
+}
+
+export interface AssociatedFlag {
+  technique_id: string;
+  technique_name: string;
+  type_: 'Positive' | 'Neutral' | 'Negative';
+  message: string;
 }
 
 export interface LyricFlag {
