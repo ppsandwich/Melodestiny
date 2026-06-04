@@ -459,7 +459,7 @@ CRITICAL FORMATTING INSTRUCTIONS:
               )}
             </div>
             
-            <div className={`${(!result || isEditorExpanded) ? 'flex' : 'hidden lg:flex'} flex-col gap-2 flex-grow h-full min-h-[600px]`}>
+            <div className={`${(!result || isEditorExpanded) ? 'flex' : 'hidden lg:flex'} flex-col gap-2 flex-grow h-full min-h-[300px] sm:min-h-[900px]`}>
               <LyricEditor 
                 value={lyrics} 
                 onChange={handleLyricsChange} 
@@ -488,7 +488,7 @@ CRITICAL FORMATTING INSTRUCTIONS:
               <ScoreBreakdown techniques={result.techniques} lines={result.highlighted_lyrics} />
             </div>
           ) : (
-            <div className="h-[600px] flex flex-col items-center justify-center opacity-50 border-2 border-dashed border-subtle rounded-lg p-6 sm:p-12 text-center bg-cream/30 min-w-0 overflow-hidden">
+            <div className="h-[300px] sm:h-[900px] flex flex-col items-center justify-center opacity-50 border-2 border-dashed border-subtle rounded-lg p-6 sm:p-12 text-center bg-cream/30 min-w-0 overflow-hidden">
               <div className="w-16 h-16 rounded-full border border-sepia/30 flex items-center justify-center mb-4 text-2xl flex-shrink-0">✍️</div>
               <p className="font-display text-2xl text-sepia mb-2 break-words">Awaiting Masterpiece</p>
               <p className="font-body text-sepia/80 max-w-sm break-words">Enter a title and start typing your lyrics. The engine will automatically analyze your song structure and phrasing.</p>

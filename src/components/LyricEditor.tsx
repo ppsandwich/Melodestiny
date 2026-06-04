@@ -37,7 +37,7 @@ export function LyricEditor({
   };
 
   return (
-    <div className="relative w-full h-[600px] border border-subtle rounded-md bg-cream shadow-inner overflow-hidden font-mono text-lg leading-relaxed flex flex-col">
+    <div className="relative w-full h-[300px] sm:h-[900px] border border-subtle rounded-md bg-cream shadow-inner overflow-hidden font-mono text-lg leading-relaxed flex flex-col">
       {/* Loading state indicator */}
       {isAnalyzing && (
         <div className="absolute top-2 right-4 z-20 text-xs font-bold text-gold uppercase tracking-widest animate-pulse">
