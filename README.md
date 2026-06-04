@@ -13,6 +13,7 @@ Melodestiny is a modern, responsive web application designed to act as a powerfu
 - **25 Algorithmic Songwriting Techniques:** Melodestiny evaluates your song against 25 proven songwriting techniques (such as "Chorus First", "Melodic Math", "Title Brevity", and "Direct Address Pronoun Density") across both line-level and global structures.
 - **Advanced Auto-Partitioning Engine:** If no section markers (like `[Verse 1]`) are provided in the lyrics, the engine automatically partitions the song into its logical structural sections (Verse, Chorus, Bridge, etc.) and tags them appropriately.
 - **Interactive Line-by-Line Feedback Popovers:** Receive specific, actionable feedback tied directly to the line numbers. Lines with feedback display a hoverable info badge `(i)` next to the syllable counts. If the line has a negative impact flag, the badge is colored red to highlight optimization opportunities. Mousing over the badge presents a detailed feedback popover.
+- **State Persistence:** Automatically saves your song title and lyrics in `localStorage` in real-time as you edit or load templates, seamlessly restoring and re-analyzing your work on page refresh or reload.
 - **Responsive Antique Design with Dark Mode:** A gorgeous UI built with custom Tailwind themes, featuring a "Parchment & Ink" aesthetic, Mustopha calligraphic display typography, and a low-light Dark Mode toggle. The layout is flawlessly responsive and looks premium on both 4K monitors and mobile phones.
 
 ---
