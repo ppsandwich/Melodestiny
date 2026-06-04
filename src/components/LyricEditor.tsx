@@ -49,7 +49,7 @@ export function LyricEditor({
       {isGenerating && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-cream/90 z-30 pointer-events-auto backdrop-blur-xs">
           <div className="w-10 h-10 border-4 border-gold border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="font-display font-medium text-sepia animate-pulse">Generating & grading 3 candidates...</p>
+          <p className="font-display font-medium text-sepia animate-pulse">Generating lyrics...</p>
         </div>
       )}
 
