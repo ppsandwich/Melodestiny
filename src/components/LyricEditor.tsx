@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { LyricLine } from "@/lib/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
@@ -9,11 +9,24 @@ interface LyricEditorProps {
   lines: LyricLine[] | null;
   isAnalyzing: boolean;
   onLoadDemo?: () => void;
+  onGenerateLyrics?: (prompt: string) => void;
+  isGenerating?: boolean;
+  hasApiKey?: boolean;
 }
 
-export function LyricEditor({ value, onChange, lines, isAnalyzing, onLoadDemo }: LyricEditorProps) {
+export function LyricEditor({ 
+  value, 
+  onChange, 
+  lines, 
+  isAnalyzing, 
+  onLoadDemo, 
+  onGenerateLyrics, 
+  isGenerating = false, 
+  hasApiKey = false 
+}: LyricEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
+  const [localPrompt, setLocalPrompt] = useState("");
 
   // Sync scroll between textarea and background
   const handleScroll = () => {
@@ -32,15 +45,62 @@ export function LyricEditor({ value, onChange, lines, isAnalyzing, onLoadDemo }:
         </div>
       )}
 
-      {/* Demo Button overlay when blank */}
-      {!value.trim() && onLoadDemo && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-          <button
-            onClick={onLoadDemo}
-            className="pointer-events-auto px-6 py-3 rounded-full bg-gold/10 hover:bg-gold/25 text-gold border border-gold/30 hover:border-gold transition-all duration-300 font-display font-medium text-sm tracking-wider uppercase shadow-lg flex items-center gap-2 cursor-pointer backdrop-blur-xs"
-          >
-            ✨ Load Demo Song
-          </button>
+      {/* Lyric Generation Loading state indicator */}
+      {isGenerating && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-cream/90 z-30 pointer-events-auto backdrop-blur-xs">
+          <div className="w-10 h-10 border-4 border-gold border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="font-display font-medium text-sepia animate-pulse">Generating & grading 3 candidates...</p>
+        </div>
+      )}
+
+      {/* Demo & Generation overlay when blank */}
+      {!value.trim() && !isGenerating && onLoadDemo && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 pointer-events-none z-20 p-8 max-w-md mx-auto text-center">
+          <div className="flex flex-col items-center justify-center gap-3 w-full pointer-events-auto">
+            <button
+              onClick={onLoadDemo}
+              className="px-6 py-3 rounded-full bg-gold/10 hover:bg-gold/25 text-gold border border-gold/30 hover:border-gold transition-all duration-300 font-display font-medium text-sm tracking-wider uppercase shadow-lg flex items-center gap-2 cursor-pointer backdrop-blur-xs w-full justify-center"
+            >
+              ✨ Load Demo Song
+            </button>
+          </div>
+          
+          {onGenerateLyrics && (
+            <>
+              <div className="text-sepia/40 font-mono text-xs select-none">— OR —</div>
+              
+              <div className="w-full bg-cream/80 border border-subtle/50 p-5 rounded-lg shadow-md pointer-events-auto flex flex-col gap-3 backdrop-blur-xs">
+                <h4 className="font-display font-semibold text-sm text-ink tracking-wide">AI Lyric Generator (Best of 3)</h4>
+                
+                {hasApiKey ? (
+                  <div className="flex flex-col gap-2.5">
+                    <textarea
+                      value={localPrompt}
+                      onChange={(e) => setLocalPrompt(e.target.value)}
+                      placeholder="e.g. A slow, introspective folk song about looking back at summer regrets..."
+                      rows={3}
+                      className="w-full text-xs font-body p-2.5 rounded border border-subtle bg-parchment/30 outline-none focus:border-gold text-ink resize-none"
+                    />
+                    <button
+                      onClick={() => {
+                        if (localPrompt.trim()) {
+                          onGenerateLyrics(localPrompt);
+                        }
+                      }}
+                      disabled={!localPrompt.trim()}
+                      className="px-4 py-2.5 rounded bg-gold text-cream hover:bg-gold-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-display font-medium text-xs tracking-wider uppercase shadow-sm cursor-pointer"
+                    >
+                      Generate Lyrics
+                    </button>
+                  </div>
+                ) : (
+                  <p className="font-body text-xs text-sepia/70 italic leading-relaxed">
+                    🔑 Enter your OpenRouter API Key in the top-right header configuration to unlock lyric generation.
+                  </p>
+                )}
+              </div>
+            </>
+          )}
         </div>
       )}
       
