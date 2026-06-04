@@ -12,7 +12,7 @@ import { processSyllables } from "@/app/actions";
 import { demoSongs } from "@/lib/demoSongs";
 import { useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenFancy, faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
+import { faPenFancy, faChevronDown, faChevronUp, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Home() {
@@ -116,6 +116,14 @@ export default function Home() {
     triggerAnalysis(randomSong.title, randomSong.lyrics);
   };
 
+  const handleReset = () => {
+    localStorage.removeItem("melodestiny_title");
+    localStorage.removeItem("melodestiny_lyrics");
+    setTitle("");
+    setLyrics("");
+    setResult(null);
+  };
+
   return (
     <div className="min-h-screen p-4 md:p-8 flex justify-center w-full overflow-hidden">
       <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-[1fr_400px] xl:grid-cols-[1fr_500px] gap-8 min-w-0 mt-[30px]">
@@ -123,7 +131,15 @@ export default function Home() {
         {/* Left Column: Unified Editor */}
         <div className="flex flex-col gap-6 min-w-0">
           <header className="mb-4 relative">
-            <div className="absolute top-0 right-0 z-20">
+            <div className="absolute top-0 right-0 z-20 flex items-center gap-3">
+              <button
+                onClick={handleReset}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-cream shadow-card border border-subtle text-sepia hover:text-gold transition-colors focus:outline-none cursor-pointer"
+                aria-label="Reset Application"
+                title="Reset Application State"
+              >
+                <FontAwesomeIcon icon={faUndo} className="text-sm" />
+              </button>
               <ThemeToggle />
             </div>
             <h1 className="text-5xl sm:text-6xl md:text-7xl font-title mb-2 text-ink flex items-center gap-3 sm:gap-4 flex-wrap break-words pr-12">
