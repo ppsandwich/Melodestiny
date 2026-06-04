@@ -98,6 +98,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "Structural issues detected. Ensure the chorus is the focal point of the song.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: None,
     }
 }

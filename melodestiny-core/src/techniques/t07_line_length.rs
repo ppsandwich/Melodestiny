@@ -77,6 +77,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "Your lines vary too much in length within sections. This hurts rhythmic predictability.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: Some("melodic_complexity".to_string()),
     }
 }

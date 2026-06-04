@@ -65,6 +65,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             format!("Mantra density is {:.1}% (ideal is 30-60%). Try locking into a short phrase and repeating it as a chant.", density * 100.0)
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: Some("repetition_dynamics".to_string()),
     }
 }

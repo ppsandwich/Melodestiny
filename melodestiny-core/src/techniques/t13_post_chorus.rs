@@ -71,6 +71,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "Consider adding a 1-to-4 word post-chorus drop. Let an instrumental hook carry the melody here.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: None,
     }
 }

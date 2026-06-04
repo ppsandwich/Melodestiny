@@ -85,6 +85,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "Structural issues detected. A standard pop song needs verses, a chorus, and usually a bridge for contrast.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: Some("structural_resolution".to_string()),
     }
 }

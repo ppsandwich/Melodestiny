@@ -105,7 +105,92 @@ pub fn analyze_input(input: &AnalysisInput) -> AnalysisOutput {
     // T25 Tension and Release
     techniques.push(crate::techniques::t25_tension_release::analyze(&lines));
 
-    let total_score = techniques.iter().map(|t| t.weighted_score).sum();
+    // T26 Lyrical Bookends
+    techniques.push(crate::techniques::t26_lyrical_bookends::analyze(&lines));
+
+    // T27 Phonetic Alliteration & Assonance
+    techniques.push(crate::techniques::t27_alliteration_assonance::analyze(&lines));
+
+    // T28 Line-Ending Phonetic Texture
+    techniques.push(crate::techniques::t28_phonetic_texture::analyze(&lines));
+
+    // T29 Lexical Variety
+    techniques.push(crate::techniques::t29_lexical_variety::analyze(&lines));
+
+    // T30 Title Phonetic Catchiness
+    techniques.push(crate::techniques::t30_title_catchiness::analyze(input));
+
+    // T31 Parenthetical ad-libs
+    techniques.push(crate::techniques::t31_parenthetical_adlibs::analyze(&lines));
+
+    // T32 Enjambment Pacing
+    techniques.push(crate::techniques::t32_enjambment_pacing::analyze(&lines));
+
+    // T33 Title Framing
+    techniques.push(crate::techniques::t33_title_framing::analyze(input, &lines));
+
+    // T34 Syllable Gradient
+    techniques.push(crate::techniques::t34_syllable_gradient::analyze(&lines));
+
+    // T35 Narrative Pronominal Shift
+    techniques.push(crate::techniques::t35_pronominal_shift::analyze(&lines));
+
+    // Grouping & Contradiction Logic
+    let groups = vec![
+        "repetition_dynamics",
+        "vocabulary_style",
+        "melodic_complexity",
+        "narrative_continuity",
+        "structural_resolution",
+    ];
+
+    for group_name in groups {
+        let mut indices = Vec::new();
+        for (idx, t) in techniques.iter().enumerate() {
+            if let Some(ref gid) = t.group_id {
+                if gid == group_name {
+                    indices.push(idx);
+                }
+            }
+        }
+
+        if !indices.is_empty() {
+            let mut highest_idx = indices[0];
+            let mut highest_score = techniques[highest_idx].weighted_score;
+
+            for &idx in &indices[1..] {
+                let score = techniques[idx].weighted_score;
+                if score > highest_score {
+                    highest_score = score;
+                    highest_idx = idx;
+                }
+            }
+
+            for &idx in &indices {
+                if idx == highest_idx {
+                    techniques[idx].active = true;
+                } else {
+                    techniques[idx].active = false;
+                }
+            }
+        }
+    }
+
+    let active_weighted_sum: f64 = techniques.iter()
+        .filter(|t| t.active)
+        .map(|t| t.weighted_score)
+        .sum();
+
+    let active_weight_sum: f64 = techniques.iter()
+        .filter(|t| t.active)
+        .map(|t| t.weight)
+        .sum();
+
+    let total_score = if active_weight_sum > 0.0 {
+        active_weighted_sum / active_weight_sum
+    } else {
+        0.0
+    };
 
     AnalysisOutput {
         total_score,

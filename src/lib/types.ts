@@ -21,6 +21,8 @@ export interface TechniqueResult {
   weighted_score: number;
   feedback: string;
   flags: LyricFlag[];
+  active: boolean;
+  group_id: string | null;
 }
 
 export interface LyricLine {

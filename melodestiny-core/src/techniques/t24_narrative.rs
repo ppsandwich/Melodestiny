@@ -66,6 +66,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "The narrative relies too much on vague words (things, somewhere). Ground the story with specific colors, times, or places.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: None,
     }
 }

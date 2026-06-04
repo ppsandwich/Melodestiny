@@ -3,7 +3,19 @@
 import { TechniqueResult } from "@/lib/types";
 
 export function ScoreBreakdown({ techniques }: { techniques: TechniqueResult[] }) {
+  const groupNames: { [key: string]: string } = {
+    repetition_dynamics: "Repetition Strategy",
+    vocabulary_style: "Lyric Phrasing & Vocabulary",
+    melodic_complexity: "Rhythmic & Melodic Complexity",
+    narrative_continuity: "Narrative Continuity",
+    structural_resolution: "Structural Resolution",
+  };
+
   const sorted = [...techniques].sort((a, b) => {
+    // Sort active ones first
+    if (a.active !== b.active) {
+      return a.active ? -1 : 1;
+    }
     if (a.raw_score !== b.raw_score) return a.raw_score - b.raw_score;
     return a.id.localeCompare(b.id);
   });
@@ -17,28 +29,41 @@ export function ScoreBreakdown({ techniques }: { techniques: TechniqueResult[] }
       <div className="divide-y divide-subtle">
         {sorted.map(t => {
           return (
-            <div key={t.id} className="flex flex-col p-4 bg-transparent hover:bg-parchment/10 transition-colors">
+            <div 
+              key={t.id} 
+              className={`flex flex-col p-4 bg-transparent hover:bg-parchment/10 transition-colors ${
+                !t.active ? 'opacity-50 grayscale hover:opacity-100 hover:grayscale-0' : ''
+              }`}
+            >
               <div className="flex items-start sm:items-center justify-between mb-4 gap-4">
                 <div className="flex items-start sm:items-center gap-4 flex-1 min-w-0">
                   <div className={`
                     w-12 text-center py-1 rounded text-sm font-mono font-medium flex-shrink-0
-                    ${t.raw_score >= 0.8 ? 'bg-sage text-white' : 
+                    ${!t.active ? 'bg-sepia/20 text-sepia' :
+                      t.raw_score >= 0.8 ? 'bg-sage text-white' : 
                       t.raw_score >= 0.5 ? 'bg-gold text-black' : 
                       'bg-rust text-white'}
                   `}>
                     {Math.round(t.raw_score * 100)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-display text-base sm:text-lg text-ink break-words">
-                      <span className="text-sepia text-sm font-mono mr-2">{t.id}</span>
-                      {t.name}
-                      <span className="block sm:inline text-sm font-body italic text-sepia/80 sm:ml-3 font-normal mt-1 sm:mt-0">by {t.author}</span>
+                    <div className="font-display text-base sm:text-lg text-ink break-words flex items-center flex-wrap gap-x-2 gap-y-1">
+                      <div>
+                        <span className="text-sepia text-sm font-mono mr-2">{t.id}</span>
+                        <span className={!t.active ? 'line-through text-sepia' : ''}>{t.name}</span>
+                        <span className="block sm:inline text-sm font-body italic text-sepia/80 sm:ml-3 font-normal mt-1 sm:mt-0">by {t.author}</span>
+                      </div>
+                      {!t.active && (
+                        <span className="inline-block bg-sepia/10 text-sepia text-[10px] font-mono px-2 py-0.5 rounded border border-sepia/20 uppercase tracking-wide">
+                          Bypassed ({t.group_id ? groupNames[t.group_id] : ''})
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
                 
                 <div className="hidden md:block text-sm text-sepia font-mono flex-shrink-0">
-                  Weight: {(t.weight * 100).toFixed(1)}%
+                  {t.active ? `Weight: ${(t.weight * 100).toFixed(1)}%` : "Bypassed"}
                 </div>
               </div>
               

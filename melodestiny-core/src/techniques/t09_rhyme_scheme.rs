@@ -106,6 +106,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "The rhyme scheme feels unpredictable. Establish a strong AABB or ABAB pattern to ground the listener.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: None,
     }
 }

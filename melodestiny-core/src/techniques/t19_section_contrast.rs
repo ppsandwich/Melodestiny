@@ -74,6 +74,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "Verses and choruses use too much of the same vocabulary. Differentiate them to make the chorus hit harder.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: None,
     }
 }

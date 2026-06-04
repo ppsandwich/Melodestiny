@@ -69,6 +69,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "The emotional arc is flat or inverted. Use more evocative, high-energy words in the chorus to build a climax.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: None,
     }
 }

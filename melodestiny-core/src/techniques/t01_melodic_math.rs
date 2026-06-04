@@ -82,6 +82,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "Some lines deviate heavily from their section's rhythmic average. Consider adjusting syllable counts to match the pattern.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: None,
     }
 }

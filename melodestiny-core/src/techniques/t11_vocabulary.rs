@@ -55,6 +55,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "You are using too many multi-syllabic or complex words. Simplify to make it conversational.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: Some("vocabulary_style".to_string()),
     }
 }

@@ -46,6 +46,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "Lacking raw emotional words. Consider describing the physical sensation of the emotion (e.g., 'lungs collapsing' instead of 'feeling sad').".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: Some("vocabulary_style".to_string()),
     }
 }

@@ -78,6 +78,8 @@ pub fn analyze(input: &AnalysisInput, lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "Title is missing from the lyrics. Consider renaming the song to match the hook.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: None,
     }
 }

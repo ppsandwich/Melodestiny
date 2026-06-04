@@ -87,6 +87,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "The bridge recycles too much vocabulary from the rest of the song. Introduce new concepts here for contrast.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: None,
     }
 }

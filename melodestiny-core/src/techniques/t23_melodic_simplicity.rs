@@ -50,6 +50,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "Your melodies might be overcomplicated. Try stripping out unnecessary syllables and focusing the core rhythm.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: Some("melodic_complexity".to_string()),
     }
 }

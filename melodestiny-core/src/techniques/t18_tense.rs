@@ -71,6 +71,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "Your song jumps around between tenses. Pick one timeline (usually present or past) and stick to it.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: Some("narrative_continuity".to_string()),
     }
 }

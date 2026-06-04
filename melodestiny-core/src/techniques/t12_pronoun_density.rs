@@ -65,6 +65,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             format!("Your direct address density is {:.1}%. Consider using more 'I' and 'you' to connect with the listener.", density * 100.0)
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: None,
     }
 }

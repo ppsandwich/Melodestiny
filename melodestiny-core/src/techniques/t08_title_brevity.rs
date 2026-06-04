@@ -20,6 +20,8 @@ pub fn analyze(input: &AnalysisInput) -> TechniqueResult {
         weight: t08_weight,
         weighted_score: t08_raw * t08_weight * 100.0,
         feedback: t08_feedback,
-        flags: vec![],
+        flags: vec![],,
+        active: true,
+        group_id: None,
     }
 }

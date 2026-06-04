@@ -95,7 +95,9 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
             weight: 0.033,
             weighted_score: 0.0,
             feedback: "No lyrics found to evaluate.".to_string(),
-            flags: vec![],
+            flags: vec![],,
+        active: true,
+        group_id: None,
         }
     }
 }

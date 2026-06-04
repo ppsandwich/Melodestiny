@@ -66,6 +66,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "Consider repeating your strongest phrases more frequently to create a stickier hook.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: Some("repetition_dynamics".to_string()),
     }
 }

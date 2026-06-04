@@ -57,6 +57,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             format!("Your concrete imagery density is {:.1}%. Try replacing abstract concepts (love, time) with tangible things people can see and feel.", density * 100.0)
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: None,
     }
 }

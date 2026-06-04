@@ -79,6 +79,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "There is a significant imbalance between verse and chorus lengths. This can cause pacing issues.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: None,
     }
 }

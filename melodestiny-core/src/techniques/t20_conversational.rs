@@ -67,6 +67,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "The lyrics feel a bit rigid. Try using more contractions, questions, and casual filler words to make it feel like a real conversation.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: None,
     }
 }

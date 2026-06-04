@@ -26,6 +26,8 @@ pub struct TechniqueResult {
     pub weighted_score: f64,
     pub feedback: String,
     pub flags: Vec<LyricFlag>,
+    pub active: bool,
+    pub group_id: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]

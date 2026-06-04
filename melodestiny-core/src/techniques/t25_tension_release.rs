@@ -62,6 +62,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
         } else {
             "Your phrases are all the exact same length. Break the pattern by following a wordy section with a long, drawn-out note.".to_string()
         },
-        flags,
+        flags,,
+        active: true,
+        group_id: None,
     }
 }
