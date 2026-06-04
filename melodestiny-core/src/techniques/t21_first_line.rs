@@ -3,7 +3,10 @@ use crate::types::{LyricLine, TechniqueResult, LyricFlag, FlagType};
 pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
     let mut flags = Vec::new();
     
-    let first_line_opt = lines.iter().find(|l| !l.text.trim().is_empty());
+    let first_line_opt = lines.iter().find(|l| {
+        let t = l.text.trim();
+        !t.is_empty() && !t.starts_with('[') && !t.starts_with('{')
+    });
 
     if let Some(first_line) = first_line_opt {
         let text = first_line.text.to_lowercase();
@@ -84,6 +87,8 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
                 "Your first line is a bit weak or vague. The listener might tune out. Drop them right into the action.".to_string()
             },
             flags,
+            active: true,
+            group_id: None,
         }
     } else {
         TechniqueResult {
@@ -95,9 +100,9 @@ pub fn analyze(lines: &[LyricLine]) -> TechniqueResult {
             weight: 0.033,
             weighted_score: 0.0,
             feedback: "No lyrics found to evaluate.".to_string(),
-            flags: vec![],,
-        active: true,
-        group_id: None,
+            flags: vec![],
+            active: true,
+            group_id: None,
         }
     }
 }

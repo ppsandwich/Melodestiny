@@ -216,6 +216,89 @@ function process_analysis_in_js(input_json_str, raw_result_str) {
     data.techniques.forEach(t => {
         t.active = true;
         const num = parseInt(t.id.replace(/\D/g, ''));
+        
+        if (num === 21) {
+            // Recalculate T21 (First Line Hook) in JavaScript to bypass the Rust header-line bug!
+            const linesList = data.highlighted_lyrics || [];
+            const first_line = linesList.find(l => l.line_number > 0);
+            if (first_line) {
+                const text = first_line.text.toLowerCase();
+                const words = text.split(/\s+/).map(w => w.replace(/[^a-z]/g, "")).filter(w => w.length > 0);
+                
+                let score = 0.0;
+                const newFlags = [];
+                
+                // Check for questions
+                if (text.includes('?')) {
+                    score += 0.4;
+                    newFlags.push({
+                        type_: "Positive",
+                        line_number: first_line.line_number,
+                        message: "Opening with a question instantly engages the listener's curiosity."
+                    });
+                }
+                
+                // Check for direct address
+                const pronouns = ["i", "you", "we"];
+                for (const word of words) {
+                    if (pronouns.includes(word)) {
+                        score += 0.3;
+                        newFlags.push({
+                            type_: "Positive",
+                            line_number: first_line.line_number,
+                            message: `Using '${word}' in the first line grounds the perspective immediately.`
+                        });
+                        break;
+                    }
+                }
+                
+                // Check for concrete imagery
+                const scene_words = ["night", "day", "morning", "street", "car", "bed", "room", "bar", "club", "clock", "door", "window", "rain", "sun", "city", "town"];
+                for (const word of words) {
+                    if (scene_words.includes(word)) {
+                        score += 0.3;
+                        newFlags.push({
+                            type_: "Positive",
+                            line_number: first_line.line_number,
+                            message: `'${word}' sets a specific scene right away.`
+                        });
+                        break;
+                    }
+                }
+                
+                // Check for vague openings
+                const vague_words = ["something", "someone", "somewhere", "feel", "feeling"];
+                for (const word of words) {
+                    if (vague_words.includes(word)) {
+                        score -= 0.3;
+                        newFlags.push({
+                            type_: "Negative",
+                            line_number: first_line.line_number,
+                            message: `Opening with '${word}' is vague. Start in the middle of the action.`
+                        });
+                    }
+                }
+                
+                const raw_score = Math.max(0.0, Math.min(1.0, score));
+                t.raw_score = raw_score;
+                t.weighted_score = raw_score * t.weight * 100.0;
+                t.flags = newFlags;
+                
+                if (raw_score > 0.8) {
+                    t.feedback = "Incredible opening line! It sets the scene, perspective, and hooks the listener immediately.";
+                } else if (raw_score > 0.5) {
+                    t.feedback = "Good opening line, but it could be punchier. Try starting with a specific detail or a question.";
+                } else {
+                    t.feedback = "Your first line is a bit weak or vague. The listener might tune out. Drop them right into the action.";
+                }
+            } else {
+                t.raw_score = 0.0;
+                t.weighted_score = 0.0;
+                t.feedback = "No lyrics found to evaluate.";
+                t.flags = [];
+            }
+        }
+
         if (num === 3 || num === 4) {
             t.group_id = "repetition_dynamics";
         } else if (num === 7 || num === 23) {
