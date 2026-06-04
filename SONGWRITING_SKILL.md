@@ -1,6 +1,6 @@
 # Melodestiny Songwriting Skill Guide (Score Optimization Playbook)
 
-This songwriting blueprint outlines all **35 songwriting evaluation techniques** implemented in the Melodestiny analysis engine. By adhering to the constraints and styling rules documented below, you can engineer lyrics that achieve a perfect **100/100** score.
+This songwriting blueprint outlines all **55 songwriting evaluation techniques** implemented in the Melodestiny analysis engine. By adhering to the constraints and styling rules documented below, you can engineer lyrics that achieve a perfect **100/100** score.
 
 ---
 
@@ -13,7 +13,7 @@ $$\text{Total Score} = \frac{\sum (\text{Raw Score}_i \times \text{Weight}_i)}{\
 To prevent conflicting metrics from penalizing different songwriting styles, the engine classifies certain techniques into 5 groups. Within each group, only the technique that scores the **highest** is marked active; other inactive techniques do not penalize the overall average:
 1. **`repetition_dynamics`**: `T03` (Repetition) vs. `T04` (Mantra Density)
 2. **`melodic_complexity`**: `T07` (Line Length) vs. `T23` (Melodic Simplicity) vs. `T34` (Syllable Gradient)
-3. **`vocabulary_style`**: `T11` (Vocabulary Simplicity) vs. `T22` (Raw Emotion Words)
+3. **`vocabulary_style`**: `T11` (Vocabulary Simplicity) vs. `T22` (Raw Emotion Words) vs. `T52` (Word Length Contrast)
 4. **`structural_resolution`**: `T15` (Structural Advisory) vs. `T26` (Lyrical Bookends)
 5. **`narrative_continuity`**: `T18` (Tense Consistency) vs. `T35` (Pronominal Shift)
 
