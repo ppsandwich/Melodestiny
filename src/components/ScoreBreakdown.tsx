@@ -1,8 +1,14 @@
 "use client";
 
-import { TechniqueResult } from "@/lib/types";
+import { TechniqueResult, LyricLine } from "@/lib/types";
 
-export function ScoreBreakdown({ techniques }: { techniques: TechniqueResult[] }) {
+export function ScoreBreakdown({ 
+  techniques, 
+  lines 
+}: { 
+  techniques: TechniqueResult[]; 
+  lines: LyricLine[] | null; 
+}) {
   const groupNames: { [key: string]: string } = {
     repetition_dynamics: "Repetition Strategy",
     vocabulary_style: "Lyric Phrasing & Vocabulary",
@@ -20,10 +26,112 @@ export function ScoreBreakdown({ techniques }: { techniques: TechniqueResult[] }
     return a.id.localeCompare(b.id);
   });
 
+  const handleExportFeedback = () => {
+    let report = `MELODESTINY DETAILED FEEDBACK REPORT\n`;
+    report += `====================================\n\n`;
+
+    const linesMap = new Map<number, string>();
+    if (lines) {
+      lines.forEach(line => {
+        if (line.line_number > 0) {
+          linesMap.set(line.line_number, line.text);
+        }
+      });
+    }
+
+    sorted.forEach(t => {
+      report += `[${t.id}] ${t.name} (by ${t.author})\n`;
+      report += `Score: ${t.active ? Math.round(t.raw_score * 100) : "Bypassed"} / 100\n`;
+      if (t.active) {
+        report += `Weight: ${(t.weight * 100).toFixed(1)}%\n`;
+      }
+      report += `------------------------------------\n`;
+      report += `${t.feedback}\n`;
+
+      if (t.flags && t.flags.length > 0) {
+        report += `\nSpecific Flags:\n`;
+        
+        const groupedFlags: { [msg: string]: { type_: string, lines: number[] } } = {};
+        t.flags.forEach(flag => {
+          if (!groupedFlags[flag.message]) {
+            groupedFlags[flag.message] = { type_: flag.type_, lines: [] };
+          }
+          groupedFlags[flag.message].lines.push(flag.line_number);
+        });
+
+        const uniqueFlags = Object.entries(groupedFlags).map(([message, data]) => {
+          const sortedLines = data.lines.sort((a, b) => a - b);
+          return { message, type_: data.type_, firstLine: sortedLines[0], otherLines: sortedLines.slice(1) };
+        }).sort((a, b) => a.firstLine - b.firstLine);
+
+        const generalTechniques = new Set([
+          "T02", "T03", "T04", "T05", "T08", "T09", "T10", "T13", "T15", "T16", "T18", "T19", "T25", "T28", "T29", "T30", "T34", "T35"
+        ]);
+        const isGeneral = generalTechniques.has(t.id);
+
+        uniqueFlags.forEach(flag => {
+          const firstLineNum = flag.firstLine;
+          const lyricText = linesMap.get(firstLineNum) || "";
+          const cleanLyric = lyricText.replace(/·/g, '').trim();
+          
+          let lineLabel = "";
+          if (isGeneral && firstLineNum === 1) {
+            lineLabel = "General: ";
+          } else {
+            lineLabel = `Line ${firstLineNum}: `;
+            if (cleanLyric) {
+              lineLabel += `"${cleanLyric}" - `;
+            }
+          }
+          
+          report += `  - [${flag.type_}] ${lineLabel}${flag.message}`;
+          if (flag.otherLines.length > 0 && !isGeneral) {
+            report += ` (also on Line ${flag.otherLines.join(', Line ')})`;
+          }
+          report += `\n`;
+        });
+      }
+      report += `\n\n`;
+    });
+
+    report += `====================================\n`;
+    report += `FULL LYRICS\n`;
+    report += `====================================\n\n`;
+    
+    if (lines) {
+      lines.forEach(line => {
+        const cleanLineText = line.text.replace(/·/g, '');
+        if (line.line_number > 0) {
+          report += `${line.line_number.toString().padStart(3, ' ')}: ${cleanLineText}\n`;
+        } else {
+          report += `${cleanLineText}\n`;
+        }
+      });
+    }
+
+    const blob = new Blob([report], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `Detailed_Feedback_Report.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="bg-cream border border-subtle rounded-md shadow-card overflow-hidden">
-      <div className="p-4 border-b border-subtle bg-parchment/30">
+      <div className="p-4 border-b border-subtle bg-parchment/30 flex justify-between items-center">
         <h3 className="font-display text-xl">Detailed Feedback</h3>
+        {techniques.length > 0 && (
+          <button
+            onClick={handleExportFeedback}
+            className="font-mono text-xs text-sepia hover:text-gold transition-colors underline cursor-pointer"
+          >
+            Export
+          </button>
+        )}
       </div>
       
       <div className="divide-y divide-subtle">

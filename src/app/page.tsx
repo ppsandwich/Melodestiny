@@ -236,6 +236,19 @@ CRITICAL FORMATTING INSTRUCTIONS:
     setResult(null);
   };
 
+  const handleExportLyrics = () => {
+    const cleanLyrics = lyrics.replace(/·/g, '');
+    const blob = new Blob([cleanLyrics], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${title || "lyrics"}_raw.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen p-4 md:p-8 flex justify-center w-full overflow-hidden">
       <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-[1fr_400px] xl:grid-cols-[1fr_500px] gap-8 min-w-0 mt-[30px]">
@@ -341,7 +354,17 @@ CRITICAL FORMATTING INSTRUCTIONS:
 
           <div className="flex flex-col gap-2 flex-grow h-full">
             <div className="flex justify-between items-end mb-2">
-              <label className="font-display text-xl text-ink">Lyrics Editor</label>
+              <div className="flex items-center gap-3">
+                <label className="font-display text-xl text-ink">Lyrics Editor</label>
+                {lyrics.trim() && (
+                  <button
+                    onClick={handleExportLyrics}
+                    className="font-mono text-xs text-sepia hover:text-gold transition-colors underline cursor-pointer"
+                  >
+                    Export
+                  </button>
+                )}
+              </div>
               
               {/* Mobile Editor Accordion */}
               {result && (
@@ -384,7 +407,7 @@ CRITICAL FORMATTING INSTRUCTIONS:
 
               <TechniqueScoresCard techniques={result.techniques} total_score={result.total_score} />
               
-              <ScoreBreakdown techniques={result.techniques} />
+              <ScoreBreakdown techniques={result.techniques} lines={result.highlighted_lyrics} />
             </div>
           ) : (
             <div className="h-[600px] flex flex-col items-center justify-center opacity-50 border-2 border-dashed border-subtle rounded-lg p-6 sm:p-12 text-center bg-cream/30 min-w-0 overflow-hidden">
