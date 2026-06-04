@@ -19,6 +19,7 @@ Melodestiny is a web-based song lyric analysis tool that scores pop songs on str
 - **Demo Song Loader** for quick loading of 10 global #1 pop hits from the last 20 years
 - **Interactive hoverable line-level feedback badges** (gold for positive/neutral, red for negative)
 - **State Persistence** automatically saving the song title and lyrics to `localStorage` to preserve work on reload/refresh
+- **Application Reset** header button that clears local storage cache and instantly restores the blank initial editor state
 - **Dark Mode** toggle supporting an organic, low-light aesthetic
 - **Improved rhyme detection** with magic-e and diphthong handling
 - **Responsive design** optimized for mobile and desktop

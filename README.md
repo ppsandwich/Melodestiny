@@ -14,6 +14,7 @@ Melodestiny is a modern, responsive web application designed to act as a powerfu
 - **Advanced Auto-Partitioning Engine:** If no section markers (like `[Verse 1]`) are provided in the lyrics, the engine automatically partitions the song into its logical structural sections (Verse, Chorus, Bridge, etc.) and tags them appropriately.
 - **Interactive Line-by-Line Feedback Popovers:** Receive specific, actionable feedback tied directly to the line numbers. Lines with feedback display a hoverable info badge `(i)` next to the syllable counts. If the line has a negative impact flag, the badge is colored red to highlight optimization opportunities. Mousing over the badge presents a detailed feedback popover.
 - **State Persistence:** Automatically saves your song title and lyrics in `localStorage` in real-time as you edit or load templates, seamlessly restoring and re-analyzing your work on page refresh or reload.
+- **Application Reset:** Instantly clears all application React states (song title, lyrics text, analysis output) and resets the cached `localStorage` data at the press of a header button.
 - **Responsive Antique Design with Dark Mode:** A gorgeous UI built with custom Tailwind themes, featuring a "Parchment & Ink" aesthetic, Mustopha calligraphic display typography, and a low-light Dark Mode toggle. The layout is flawlessly responsive and looks premium on both 4K monitors and mobile phones.
 
 ---
