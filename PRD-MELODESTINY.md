@@ -1,8 +1,8 @@
 # Melodestiny — Product Requirements Document
 
-**Version:** 2.0
-**Status:** In Development
-**Last Updated:** 2026-05-30
+**Version:** 2.1
+**Status:** Complete
+**Last Updated:** 2026-06-04
 
 ---
 
@@ -10,12 +10,15 @@
 
 Melodestiny is a web-based song lyric analysis tool that scores pop songs on structural and lyrical quality using **25 algorithmic techniques** derived from the playbooks of the world's most successful pop songwriters. The user inputs a song title and lyrics, presses an analysis button, and receives a weighted score out of 100 with a detailed breakdown, highlighted lyrics showing technique application and improvement opportunities, syllable markers, and a downloadable marked-up copy of the lyrics.
 
-### Key Features (v2.0)
+### Key Features (v2.1)
 - **25 algorithmic techniques** from 10+ award-winning songwriters
 - **Inline annotations** directly on the input lyrics after analysis
 - **Syllable counting and markers** showing rhythmic structure
 - **Multi-annotation popovers** for lyrics with multiple flags
-- **Section detection** with support for square brackets and various label formats
+- **Advanced section detection & auto-partitioning** with support for square brackets, various label formats, and automatic structural segmentation
+- **Demo Song Loader** for quick loading of 10 global #1 pop hits from the last 20 years
+- **Interactive hoverable line-level feedback badges** (gold for positive/neutral, red for negative)
+- **Dark Mode** toggle supporting an organic, low-light aesthetic
 - **Improved rhyme detection** with magic-e and diphthong handling
 - **Responsive design** optimized for mobile and desktop
 
@@ -39,7 +42,7 @@ The UI must feel **organic, hand-crafted, antique, yet minimalistic**. Think: a 
 | `--color-sage` | `#7A8B6F` | Positive indicators, passing scores |
 | `--color-cream` | `#FBF8F1` | Card backgrounds |
 | `--color-blue-grey` | `#7B8FA1` | Note annotations |
-| `--font-display` | `'Playfair Display', serif` | Headings, titles |
+| `--font-display` | `'Mustopha', serif` | Custom Arabic-inspired display font for headings |
 | `--font-body` | `'Lora', serif` | Body text, lyrics |
 | `--font-mono` | `'IBM Plex Mono', monospace` | Scores, technical labels |
 | `--radius-sm` | `4px` | Subtle, not perfectly round |
@@ -51,12 +54,16 @@ The UI must feel **organic, hand-crafted, antique, yet minimalistic**. Think: a 
 
 **UI Principles:**
 - Textured backgrounds (subtle paper grain via CSS noise or SVG pattern)
-- Serif typography throughout — no sans-serif
+- Custom title font (**Mustopha**) for a distinct calligraphic, antique appearance
 - Muted earth tones only — no bright colors
 - Generous whitespace — let content breathe
 - Thin, hand-drawn-style dividers (SVG or border-image)
 - Score displayed as a wax-seal-style circular badge
 - Icons: thin line-art style, like etched illustrations
+
+**Dark Mode Theme:**
+- Toggleable low-contrast night mode using custom slate, gold, and sepia tones (`bg-slate-950`, border colors with optimized opacity, text-gold).
+- Enhanced contrast for borders and wax-seal score badge text color in dark mode.
 
 ### 2.2 Responsive Layout
 
@@ -138,6 +145,7 @@ The entire app is a **single view**. No navigation, no separate screens.
   - Supports section labels with colons: `Verse 1:`, `Chorus:`
   - Blank lines are treated as separators, not lyrics
   - Strips timestamps (`[01:23]`) and chord notation (`[Am]`) before analysis
+- **Demo Button Overlay** — Center-overlay button (`✨ Load Demo Song`) visible only when the lyrics textarea is completely blank. Loads one of ten global #1 pop hits from the last 20 years at random and automatically runs analysis.
 - **Analyze Button** — Full-width, sticky on mobile, disabled until both fields have content
 
 ### 4.2 After Analysis
@@ -145,10 +153,11 @@ The entire app is a **single view**. No navigation, no separate screens.
 After analysis, the lyrics area transforms:
 
 1. **View Analysis mode** — Shows lyrics with:
-   - Section dividers with gold labels
-   - Line numbers
-   - Syllable markers (·) at syllable boundaries
+   - Section dividers with gold labels (auto-partitioned if not originally specified)
+   - Line numbers (excluding blank lines and structural brackets)
+   - Syllable markers (·) at syllable boundaries (excluding the first syllable)
    - Syllable count at end of each line
+   - Hoverable feedback badge `(i)` next to the syllable count on lines with feedback, showing detailed line-level comments on hover (colored red if line has a negative impact flag, gold otherwise)
    - Inline annotations (gold = positive, rust = warning, blue-grey = note)
    - Click/tap any annotation to see popover with details
 
@@ -226,7 +235,8 @@ Before analysis, the engine:
 1. Filters out section labels (lines matching section patterns)
 2. Filters out blank lines
 3. Strips timestamps and chord notation
-4. Adjusts section line numbers to account for filtered lines
+4. Strips existing syllable separators (`·`) from lyrics before performing analysis
+5. Adjusts section line numbers to account for filtered lines (blank lines and brackets are excluded from line numbering and syllables)
 
 ---
 
@@ -449,12 +459,15 @@ When a text segment has multiple annotations:
 - Popover header shows count (e.g., "3 Notes")
 - Each annotation listed with type badge, technique name, author, and message
 
-### 7.3 Section Detection
+### 7.3 Section Detection & Auto-Partitioning
 
 Sections are detected from lyrics using:
 - **Square brackets:** `[Verse 1]`, `[Chorus]`, `[Bridge]`
 - **Colons:** `Verse 1:`, `Chorus:`
 - **Keywords:** verse, chorus, bridge, pre-chorus, post-chorus, intro, outro, hook, interlude, refrain, break, solo, instrumental
+
+**Auto-Partitioning Engine:**
+If the input lyrics do not contain any section titles, an advanced partitioning engine automatically segments the song into its logical sections (e.g. Intro, Verse, Chorus, Outro) based on line spacing and structural characteristics, and displays these section titles in square brackets above each section.
 
 Section labels are filtered out before analysis and displayed as visual dividers in the lyrics view.
 
@@ -469,6 +482,10 @@ Syllable detection handles:
 - Silent -e (magic e pattern)
 - Silent -ed (after consonants other than t/d)
 - Consonant + le endings
+
+### 7.5 Global / Structural Flags
+
+Global technique flags (which apply to the song as a whole rather than a specific line) are grouped and labeled under the "General" category (instead of "Line 1") in the dashboard feedback.
 
 ---
 

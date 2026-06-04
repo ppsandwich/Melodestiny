@@ -8,12 +8,12 @@ Melodestiny is a modern, responsive web application designed to act as a powerfu
 
 ## ✨ Features
 
-- **Real-Time Phonetic Analysis:** Type or paste your lyrics into the unified editor. As you pause, the engine automatically calculates syllable counts using advanced English typesetting algorithms and overlays phonetic delimiters (e.g., `in·cred·i·ble`) seamlessly into your text.
-- **25 Algorithmic Songwriting Techniques:** Melodestiny evaluates your song against 25 proven songwriting techniques (such as "Chorus First", "Melodic Math", "Title Brevity", and "Direct Address Pronoun Density").
-- **Dynamic Scoring Dashboard:** Get an instant aggregate score for your song. The interactive dashboard breaks down exactly which techniques you nailed and which need improvement, sorted from lowest score to highest to help you focus your rewrites.
-- **Line-by-Line Feedback:** Receive specific, actionable feedback tied exactly to the line numbers in your editor.
-- **Annotation Smart-Parsing:** The engine intelligently ignores structural annotations like `[Verse 1]` or `{Chorus}`, ensuring they don't skew your syllable counts or structural analysis.
-- **Responsive Antique Design:** A gorgeous UI built with custom Tailwind themes, featuring a "Parchment & Ink" aesthetic, Syamsiah Arabic typography, and a flawlessly responsive layout that looks incredible on both 4K monitors and mobile phones.
+- **Real-Time Phonetic Analysis:** Type or paste your lyrics into the unified editor. As you pause, the engine automatically calculates syllable counts using advanced English typesetting algorithms and overlays phonetic delimiters (e.g., `in·cred·i·ble`) seamlessly into your text (stripping them out cleanly before running structural analysis to avoid interference).
+- **Demo Song Loader:** If the editor is blank, a centered `✨ Load Demo Song` button overlays the canvas. Clicking it loads one of ten global #1 hit pop songs from the last 20 years at random (fully populating their titles and complete lyrics) and triggers immediate analysis.
+- **25 Algorithmic Songwriting Techniques:** Melodestiny evaluates your song against 25 proven songwriting techniques (such as "Chorus First", "Melodic Math", "Title Brevity", and "Direct Address Pronoun Density") across both line-level and global structures.
+- **Advanced Auto-Partitioning Engine:** If no section markers (like `[Verse 1]`) are provided in the lyrics, the engine automatically partitions the song into its logical structural sections (Verse, Chorus, Bridge, etc.) and tags them appropriately.
+- **Interactive Line-by-Line Feedback Popovers:** Receive specific, actionable feedback tied directly to the line numbers. Lines with feedback display a hoverable info badge `(i)` next to the syllable counts. If the line has a negative impact flag, the badge is colored red to highlight optimization opportunities. Mousing over the badge presents a detailed feedback popover.
+- **Responsive Antique Design with Dark Mode:** A gorgeous UI built with custom Tailwind themes, featuring a "Parchment & Ink" aesthetic, Mustopha calligraphic display typography, and a low-light Dark Mode toggle. The layout is flawlessly responsive and looks premium on both 4K monitors and mobile phones.
 
 ---
 
@@ -26,7 +26,7 @@ Melodestiny leverages a cutting-edge, hybrid architecture to ensure both a snapp
 - **Library:** React 
 - **Styling:** TailwindCSS v4 (Custom themed with organic, parchment-inspired design tokens)
 - **Icons:** FontAwesome
-- **Typography:** Google Fonts (Playfair Display, Lora, IBM Plex Mono) & Custom Local Fonts (Syamsiah Arabic)
+- **Typography:** Google Fonts (Lora, IBM Plex Mono) & Custom Local Fonts (Mustopha, Syamsiah Arabic)
 
 ### Backend Engine (Client-Side)
 - **Language:** Rust 🦀
@@ -87,4 +87,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to start ana
 
 ## 🎨 Design Philosophy
 
-Melodestiny rejects the clinical, sterile look of standard SaaS platforms. We opted for a **"Parchment & Ink"** motif—utilizing rich sepias, vibrant golds, and a custom SVG noise filter to give the background the tactile feel of physical paper. The goal is to make the app feel like a digital extension of a songwriter's physical notebook.
+Melodestiny rejects the clinical, sterile look of standard SaaS platforms. We opted for a **"Parchment & Ink"** motif—utilizing rich sepias, vibrant golds, and a custom SVG noise filter to give the background the tactile feel of physical paper. The goal is to make the app feel like a digital extension of a songwriter's physical notebook. 
+
+Additionally, the interface includes a toggleable low-contrast **Dark Mode** utilizing a dark-slate palette with subtle gold highlights to prevent eye strain during late-night songwriting sessions.
