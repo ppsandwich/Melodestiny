@@ -85,6 +85,11 @@ export function ScoreBreakdown({ techniques }: { techniques: TechniqueResult[] }
                     return { message, type_: data.type_, firstLine: sortedLines[0], otherLines: sortedLines.slice(1) };
                   }).sort((a, b) => a.firstLine - b.firstLine);
 
+                  const generalTechniques = new Set([
+                    "T02", "T05", "T08", "T09", "T10", "T15", "T16", "T18", "T19", "T25", "T29", "T30", "T34", "T35"
+                  ]);
+                  const isGeneral = generalTechniques.has(t.id);
+
                   return (
                     <div className="mt-4 pt-4 border-t border-subtle/30">
                       <h4 className="text-sm font-bold text-sepia uppercase tracking-wider mb-2">Specific Flags</h4>
@@ -96,10 +101,12 @@ export function ScoreBreakdown({ techniques }: { techniques: TechniqueResult[] }
                               ${flag.type_ === 'Positive' ? 'bg-sage' : 
                                 flag.type_ === 'Negative' ? 'bg-rust' : 'bg-blue-grey'}
                             `}></span>
-                            <span className="font-mono text-sepia min-w-[50px] flex-shrink-0">Line {flag.firstLine}:</span>
+                            <span className="font-mono text-sepia min-w-[50px] flex-shrink-0">
+                              {isGeneral && flag.firstLine === 1 ? "General:" : `Line ${flag.firstLine}:`}
+                            </span>
                             <span className="font-body text-ink/90 flex-1 min-w-0 break-words">
                               {flag.message}
-                              {flag.otherLines.length > 0 && (
+                              {flag.otherLines.length > 0 && !isGeneral && (
                                 <span className="text-sepia/80 ml-1">
                                   (also Line {flag.otherLines.join(', Line ')})
                                 </span>
