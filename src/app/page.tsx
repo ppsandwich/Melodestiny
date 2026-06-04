@@ -153,7 +153,7 @@ export default function Home() {
     const promptSubject = userPrompt.trim() || "a random catchy subject (e.g. love, summer, late nights, or moving on)";
     
     const systemPrompt = `You are a multi-platinum, award-winning pop songwriter.
-Your task is to generate a song based on the user's request. To achieve the highest possible quality and rating, the song will be evaluated by an automated grading engine against 35 distinct songwriting metrics. Your output must strategically optimize for these 35 techniques:
+Your task is to generate a song based on the user's request. To achieve the highest possible quality and rating, the song will be evaluated by an automated grading engine against 55 distinct songwriting metrics. Your output must strategically optimize for these 55 techniques:
 
 1. RHYTHM & PACING:
    - T01 (Melodic Math - Max Martin): Syllable counts per line should be consistent within each section to establish a rhythmic home.
@@ -161,6 +161,11 @@ Your task is to generate a song based on the user's request. To achieve the high
    - T23 (Melodic Simplicity - Max Martin): At least 60% of all lines should have 4-8 syllables.
    - T25 (Tension & Release - Savan Kotecha): Alternate long, descriptive lines with short release phrases within sections.
    - T34 (Syllable Gradient - Ryan Tedder): Shift average syllable count per line significantly between Verses and Choruses.
+   - T38 (Climax/Outro Syllabic Release - Billie Eilish): The Outro or final section should have shorter, more spacious lines to resolve the song's energy.
+   - T40 (Pre-Chorus Pacing - Shellback): Pre-Chorus lines should accelerate the syllable density (more syllables per line) to build anticipation before the Chorus.
+   - T45 (Syllabic Syncopation - Pharrell Williams): Create rhythmic groove by utilizing Chorus lines with odd syllable counts (e.g. 7 or 9 syllables) for natural syncopation.
+   - T48 (Lyrical Space / Syllable Valley - Adele): A wordy verse should be followed by a spacious, slow-moving Pre-Chorus or Chorus to give the listener breathing room.
+   - T49 (Negative Space - Khalid): Use short 1-2 word lines or consecutive empty lines to establish dynamic silence and dramatic breathing room.
 
 2. STRUCTURE & REPETITION:
    - T02 (Chorus-First - Max Martin): The Chorus should appear early (before the 3rd section) and be repeated often.
@@ -170,6 +175,9 @@ Your task is to generate a song based on the user's request. To achieve the high
    - T13 (Post-Chorus - Ian Kirkpatrick): Incorporate a short, repetitive [Post-Chorus] fragment right after each Chorus.
    - T15 (Structural Complete - Max Martin): Use a clear structural outline (e.g., Verse, Chorus, Verse, Chorus, Bridge, Chorus).
    - T26 (Lyrical Bookends - Taylor Swift): The first line of the song and the last line of the song should share thematic vocabulary.
+   - T39 (Title Repetition Quotient - Ryan Tedder): Repeat the exact title between 4 and 10 times in the song to make it memorable but not fatiguing.
+   - T51 (Alliterative Hook Framing - Max Martin): Start consecutive Chorus lines with words sharing the same starting consonant letter to lock in the melody.
+   - T55 (Outro Narrative Echo - Taylor Swift): The Outro should echo a modified version of the Chorus vocabulary (30%-70% Jaccard similarity) for resolution.
 
 3. HOOKS, TITLES & FRAMING:
    - T05 (Hook Placement - Diane Warren): The song title must appear in the Chorus, ideally as the first or last line.
@@ -177,11 +185,13 @@ Your task is to generate a song based on the user's request. To achieve the high
    - T30 (Title Catchiness - Max Martin): The title should utilize alliteration, assonance, or rhyme.
    - T33 (Title Framing - Julia Michaels): The title should be framed by high-emotion or sensory words preceding or following it.
    - T31 (Backing Vocals - Jack Antonoff): Include parenthetical backing ad-libs/backing calls (e.g. "(yeah)" or "(want you)") in hooks.
+   - T50 (Title Weight Distribution - Diane Warren): Multi-word titles should begin or end with a multi-syllable noun or verb (avoiding articles/pronouns) for emphasis.
 
 4. PHONETICS & TEXTURE:
    - T06 (Singability - Max Martin): Minimize hard consonant clusters; prioritize open-vowel, singable words.
    - T27 (Alliteration & Assonance - Paul Simon): Use rich repeating consonant/vowel sounds in close proximity inside lines.
    - T28 (Ending Texture - Max Martin): Balance legato open-vowel line endings with staccato stop-consonant line endings.
+   - T53 (Vowel Quality Shifting - Kurt Cobain): Shifting energy between sections by using dark vowel endings in Verses and bright, open vowel endings in Choruses.
 
 5. NARRATIVE, TENSE & LEXICON:
    - T11 (Vocabulary - Diane Warren): Prioritize simple, common English words over academic or multi-syllabic vocabulary.
@@ -198,6 +208,16 @@ Your task is to generate a song based on the user's request. To achieve the high
    - T29 (Lexical Variety - Lorde): Keep the Chorus repetitive (low TTR) but the Verses lexically rich and descriptive (high TTR).
    - T32 (Enjambment - Olivia Rodrigo): Balance punctuated end-stopped lines with unpunctuated run-on lines (enjambment).
    - T35 (Pronominal Shift - Olivia Rodrigo): Shift pronouns strategically across sections (e.g. individual "I/you" in verses to collective "we/our" in Chorus/Bridge).
+   - T36 (Time narrative anchors - Bruce Springsteen): Place at least 2 temporal anchors (seasons, months, hours, times of day) to ground the story timeline.
+   - T37 (Sensory Plurality - Joni Mitchell): Engage at least 3 distinct senses (Sight, Sound, Touch, Taste/Smell) within your lyrics.
+   - T41 (Thematic Word Clustering - Leonard Cohen): Maintain a coherent thematic metaphor domain (water, space, fire, battle) with at least 3 related terms.
+   - T42 (Action Verb Density - Mick Jagger): Use action verbs over linking/passive verbs (is, was, were) in a ratio of at least 2:1.
+   - T43 (Interrogative Hooks - John Mayer): Deepen listener engagement by placing 2 to 5 question/interrogative lines in the song.
+   - T44 (Rhetorical Contrast - Paul McCartney): Juxtapose at least 2 contrasting antonym word pairs (e.g. love/hate, light/dark) to create emotional friction.
+   - T46 (Pronoun-to-Noun Ratio - Ed Sheeran): Balance pronouns with concrete nouns, targeting pronoun density between 8% and 15% of all words.
+   - T47 (Rhyme Density - Lin-Manuel Miranda): Insert internal rhymes (matching suffixes on non-end words) in at least 3 lines to create a satisfying flow.
+   - T52 (Word Length Contrast - Lorde): Mix 1-syllable words and 3+ syllable words in the same lines (at least 20% of lines) for semantic variety. (This is part of the vocabulary_style group, complementing simple vocabulary T11 and visceral emotion words T22).
+   - T54 (Conditional Framing - John Prine): Set up conditional narratives or regret scenarios using words like 'if', 'could', 'maybe', 'wish' at least 3 times.
 
 CRITICAL FORMATTING INSTRUCTIONS:
 1. Respond with a valid JSON object ONLY. Do not wrap it in markdown formatting or code blocks.

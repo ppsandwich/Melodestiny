@@ -300,3 +300,163 @@ To prevent conflicting metrics from penalizing different songwriting styles, the
 * **Description**: Tracks narrative relationship progression by shifting pronouns (e.g. from 'I/you' to 'we') across sections.
 * **Scoring Logic**: Looks for pronoun usage shifts between the Verses and the Chorus/Bridge.
 * **How to Optimize**: Use "I/You" in the Verses, and shift to "We/Our" in the Chorus and Bridge to show relationship progression.
+
+### T36: Time-Oriented Narrative Anchors
+* **Author**: Taylor Swift / Bruce Springsteen
+* **Weight**: 0.030
+* **Group**: None
+* **Description**: Placing temporal anchors (e.g. morning, midnight, summer, 2 AM, years, seasons) grounds the listener's timeline.
+* **Scoring Logic**: Scans lyrics for temporal/time terms. High score if at least 2 distinct temporal anchors are present in the song.
+* **How to Optimize**: Sprinkle at least two specific time/date references in your verses (e.g., "summer night", "2 AM", "December").
+
+### T37: Sensory Plurality (Visual, Auditory, Tactile)
+* **Author**: Joni Mitchell / Lorde
+* **Weight**: 0.035
+* **Group**: None
+* **Description**: Engaging multiple senses (sound, touch, sight, taste, smell) makes the lyrical world feel three-dimensional.
+* **Scoring Logic**: Evaluates word choices in Sight, Sound, Touch, and Taste/Smell categories. High score if at least 3 distinct senses are represented.
+* **How to Optimize**: Combine visual cues ("neon glow"), auditory words ("quiet scream"), and tactile descriptions ("cold skin") inside your song.
+
+### T38: Climax/Outro Syllabic Release
+* **Author**: Billie Eilish / Finneas
+* **Weight**: 0.030
+* **Group**: None
+* **Description**: The Outro or final section should have shorter, more spacious lines to resolve the song's energy.
+* **Scoring Logic**: Compares the average syllable count of the Outro lines to the average syllable count of the rest of the song. Target is a drop of 20% or more.
+* **How to Optimize**: Make the lines in your `[Outro]` section significantly shorter (e.g., 3-5 syllables) compared to your verses.
+
+### T39: Title Repetition Quotient
+* **Author**: Max Martin / Ryan Tedder
+* **Weight**: 0.040
+* **Group**: None
+* **Description**: A commercial hook needs its title repeated enough times to stick, but not so much that it becomes annoying.
+* **Scoring Logic**: Counts occurrences of the exact song title. Perfect score if it is repeated 4 to 10 times.
+* **How to Optimize**: Place the song title inside your choruses so that it repeats between 4 and 10 times across the entire track.
+
+### T40: Pre-Chorus Transition Pacing
+* **Author**: Max Martin / Shellback
+* **Weight**: 0.035
+* **Group**: None
+* **Description**: The Pre-Chorus builds anticipation by accelerating the lyrical density (more syllables per line) before the Chorus explodes.
+* **Scoring Logic**: Evaluates if the average syllable count per line in the Pre-Chorus is at least 15% higher than the preceding Verse.
+* **How to Optimize**: Write Pre-Chorus lines with higher syllable density (faster, wordier rhythm) than the preceding verse lines.
+
+### T41: Thematic Word Clustering (Metaphor Coherence)
+* **Author**: Leonard Cohen / Bob Dylan
+* **Weight**: 0.030
+* **Group**: None
+* **Description**: A strong song sticks to a central semantic domain (e.g., weather, ocean/water, fire, war, space) rather than mixing metaphors.
+* **Scoring Logic**: Checks for matching words in 4 domains: Water, Fire, Space, and Battle. High score if a dominant domain has at least 3 distinct terms.
+* **How to Optimize**: Select a conceptual domain (e.g., water) and use multiple related terms (like "ocean", "drown", "tide", "storm") throughout the lyrics.
+
+### T42: Action Verb Density
+* **Author**: Mick Jagger / Keith Richards
+* **Weight**: 0.030
+* **Group**: None
+* **Description**: Keep the narrative moving forward by using active verbs rather than passive descriptions or linking verbs (is, was).
+* **Scoring Logic**: Compares count of action verbs (run, drive, break) to linking verbs (is, was, were). Perfect score if the action verb ratio is at least 2:1.
+* **How to Optimize**: Replace passive expressions ("I was sad") with active verbs ("I cried and broke the glass").
+
+### T43: Interrogative Hooks (Curiosity Loops)
+* **Author**: John Mayer / Julia Michaels
+* **Weight**: 0.025
+* **Group**: None
+* **Description**: Scatter questions throughout the verses or bridge to engage the listener in the song's internal conflict.
+* **Scoring Logic**: Counts lines containing question marks or starting with interrogatives. Perfect score if there are 2 to 5 question lines.
+* **How to Optimize**: Pose questions to the listener or the subject ("Why did you leave?", "What do we do now?") within the verses.
+
+### T44: Rhetorical Contrast (Antithesis)
+* **Author**: Paul McCartney / Bernie Taupin
+* **Weight**: 0.030
+* **Group**: None
+* **Description**: Juxtapose opposing ideas (e.g. love/hate, light/dark, cold/fire, win/lose) to create lyrical friction.
+* **Scoring Logic**: Checks for pairs of contrasting words in close proximity. High score if at least 2 contrasting pairs are present.
+* **How to Optimize**: Frame conflicts with contrasting terms in the same section ("frozen fire", "winning is losing", "hello and goodbye").
+
+### T45: Syllabic Syncopation (Odd-Numbered Lines)
+* **Author**: Pharrell Williams
+* **Weight**: 0.025
+* **Group**: None
+* **Description**: Create rhythmic groove by utilizing lines with odd syllable counts (e.g., 7 or 9 syllables) which naturally feel syncopated.
+* **Scoring Logic**: Measures the percentage of lines in the Chorus/Hook that have odd syllable counts. Sweet spot is 40% to 70%.
+* **How to Optimize**: Ensure that roughly half of the lines in your Chorus section contain an odd number of syllables.
+
+### T46: Pronoun-to-Noun Ratio
+* **Author**: Ed Sheeran
+* **Weight**: 0.025
+* **Group**: None
+* **Description**: Relatable storytelling balances personal pronouns (I, you) with real-world nouns.
+* **Scoring Logic**: Measures the total pronoun density (I, you, he, she, we, they, etc.) against total words. Target is 8% to 15%.
+* **How to Optimize**: Keep pronouns common but ground them with specific nouns (don't write "I went to it," write "I walked to the house").
+
+### T47: Rhyme Density (Internal Rhyming)
+* **Author**: Lin-Manuel Miranda / Eminem
+* **Weight**: 0.040
+* **Group**: None
+* **Description**: Rhymes shouldn't just be at the end of lines. Internal rhymes within a line create a dense, satisfying flow.
+* **Scoring Logic**: Scans for rhyming words *within* single lines or adjacent lines (excluding the end words). Perfect score if internal rhymes occur in >= 3 lines.
+* **How to Optimize**: Add matching sounds within lines ("a bright light in the night", "we play every day").
+
+### T48: Lyrical Space (Syllable Valley)
+* **Author**: Adele / Greg Kurstin
+* **Weight**: 0.030
+* **Group**: None
+* **Description**: A wordy verse should be followed by a spacious, slow-moving Pre-Chorus or Chorus to give the listener breathing room.
+* **Scoring Logic**: Checks for a middle section where the average syllable count per line drops by 40% or more compared to neighboring sections.
+* **How to Optimize**: Write a wordy, fast verse followed by a Chorus or Pre-Chorus where lines have very few syllables.
+
+### T49: Negative Space (Line Breaths)
+* **Author**: Billie Eilish / Khalid
+* **Weight**: 0.025
+* **Group**: None
+* **Description**: Silence is a lyric. Having double empty lines or short 1-2 word lines creates dramatic pauses.
+* **Scoring Logic**: Scans for short 1-2 word lines or multiple consecutive empty lines inside sections. Perfect score if at least 2 pauses are detected.
+* **How to Optimize**: Insert short, dramatic one-word lines ("No", "Run") followed by a double line break to create dramatic pauses.
+
+### T50: Title Weight Distribution
+* **Author**: Diane Warren
+* **Weight**: 0.030
+* **Group**: None
+* **Description**: In a multi-word title, placing the heaviest emphasis on the first or last word makes it more memorable.
+* **Scoring Logic**: Checks if a multi-word title begins or ends with a multi-syllable noun or verb (2+ syllables), rather than an article/preposition/pronoun.
+* **How to Optimize**: If your title has multiple words, start or end it with a strong content word (e.g. "Silver Shiver", "Back to Black").
+
+### T51: Alliterative Hook Framing
+* **Author**: Max Martin
+* **Weight**: 0.030
+* **Group**: None
+* **Description**: The chorus lines are more memorable if their first words share the same starting consonant sound (alliteration).
+* **Scoring Logic**: Checks if consecutive lines in the Chorus start with words sharing the same starting consonant letter.
+* **How to Optimize**: Compose Chorus lines so that adjacent lines begin with the same consonant letter (e.g. "Silent nights / Shadow fights").
+
+### T52: Word Length Contrast
+* **Author**: Lorde
+* **Weight**: 0.025
+* **Group**: `vocabulary_style`
+* **Description**: Create sonic variety by mixing very short words (1 syllable) with long, flowing words (3+ syllables) in the same line.
+* **Scoring Logic**: Measures ratio of lines containing both 1-syllable and 3+ syllable words. Perfect score if >= 20% of lines exhibit this contrast.
+* **How to Optimize**: Pair short monosyllabic words with flowing complex words in the same sentence (e.g., "I feel so beautiful in this town").
+
+### T53: Vowel Quality Shifting
+* **Author**: Kurt Cobain / Sia
+* **Weight**: 0.030
+* **Group**: None
+* **Description**: Alternate between bright vowels (A, E, I) for high energy and dark, closed vowels (O, U) for somber, introspective lines.
+* **Scoring Logic**: Compares the ratio of bright ending vowels in Verses vs. Choruses. Perfect score if ratio difference is >= 0.25.
+* **How to Optimize**: End your Verse lines with darker, closed sounds ("down", "ghost") and Chorus lines with bright, open vowel sounds ("free", "light", "sky").
+
+### T54: Conditional Narrative Framing (If-Then Logic)
+* **Author**: Taylor Swift / John Prine
+* **Weight**: 0.025
+* **Group**: None
+* **Description**: Setting up conditional scenarios ("If you...", "Then we...", "Could have...") engages the listener's imagination.
+* **Scoring Logic**: Counts occurrences of conditional words (if, could, would, wish, maybe). Perfect score if >= 3 conditional structures are present.
+* **How to Optimize**: Frame narrative regrets or scenarios conditionally ("If you called me, I would come", "Maybe we could have tried").
+
+### T55: Outro Narrative Echo
+* **Author**: Taylor Swift / Jack Antonoff
+* **Weight**: 0.035
+* **Group**: None
+* **Description**: The Outro should echo a modified version of the Chorus or Verse hook to give a sense of resolution.
+* **Scoring Logic**: Measures vocabulary Jaccard similarity between the Outro and Chorus. Perfect score if similarity is between 30% and 70% (subverted echo).
+* **How to Optimize**: Incorporate familiar Chorus vocabulary in the Outro, but rewrite the order or phrasing slightly to create contrast.
