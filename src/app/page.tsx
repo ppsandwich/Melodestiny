@@ -27,6 +27,11 @@ export default function Home() {
   const [openRouterModel, setOpenRouterModel] = useState("anthropic/claude-opus-4.7");
   const [showApiPopover, setShowApiPopover] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // States for generated candidates selection sequence
+  const [candidates, setCandidates] = useState<any[]>([]);
+  const [winnerIndex, setWinnerIndex] = useState<number>(-1);
+  const [generationState, setGenerationState] = useState<"idle" | "preview" | "selecting" | "expanding">("idle");
   
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasTriggeredInitialAnalysis = useRef(false);
@@ -56,6 +61,41 @@ export default function Home() {
       triggerAnalysis(title, lyrics);
     }
   }, [wasmReady, title, lyrics]);
+
+  // Orchestrate candidate selection and expansion transition sequence
+  useEffect(() => {
+    if (generationState === "preview") {
+      const timer = setTimeout(() => {
+        setGenerationState("selecting");
+      }, 3500); // Allow 3.5s for cards and stamps to animate in
+      return () => clearTimeout(timer);
+    } else if (generationState === "selecting") {
+      const timer = setTimeout(() => {
+        setGenerationState("expanding");
+      }, 2500); // 2.5s showing winner selection glow
+      return () => clearTimeout(timer);
+    } else if (generationState === "expanding") {
+      const timer = setTimeout(() => {
+        if (winnerIndex >= 0 && candidates[winnerIndex]) {
+          const winner = candidates[winnerIndex];
+          const winningLyrics = winner.result.highlighted_lyrics.map((line: any) => {
+            return line.syllabified_words ? line.syllabified_words.join(' ') : line.text;
+          }).join('\n');
+
+          setTitle(winner.candidate.title);
+          setLyrics(winningLyrics);
+          setResult(winner.result);
+
+          localStorage.setItem("melodestiny_title", winner.candidate.title);
+          localStorage.setItem("melodestiny_lyrics", winningLyrics);
+        }
+        setGenerationState("idle");
+        setCandidates([]);
+        setWinnerIndex(-1);
+      }, 1000); // 1s to scale up winning card and blur/fade overlay
+      return () => clearTimeout(timer);
+    }
+  }, [generationState, winnerIndex, candidates]);
 
   const triggerAnalysis = (currentTitle: string, currentLyrics: string) => {
     if (!wasmReady || !currentTitle || !currentLyrics) {
@@ -202,24 +242,26 @@ CRITICAL FORMATTING INSTRUCTIONS:
         })
       );
 
-      // Find the highest score
-      const winner = graded.reduce((prev, curr) => (curr.score > prev.score ? curr : prev), graded[0]);
-
-      if (!winner.result) {
+      // Filter out any candidates that failed to generate (highly unlikely, but keep it robust)
+      const validGraded = graded.filter(g => g.result !== null);
+      if (validGraded.length === 0) {
         throw new Error("No candidates were successfully generated and analyzed.");
       }
 
-      // Load winning candidate
-      const winningLyrics = winner.result.highlighted_lyrics.map(line => {
-        return line.syllabified_words ? line.syllabified_words.join(' ') : line.text;
-      }).join('\n');
+      // Find highest score among valid ones
+      let winningItem = validGraded[0];
+      validGraded.forEach((item) => {
+        if (item.score > winningItem.score) {
+          winningItem = item;
+        }
+      });
 
-      setTitle(winner.candidate.title);
-      setLyrics(winningLyrics);
-      setResult(winner.result);
+      // Find the original index of this winner in the graded array (so it aligns with cards)
+      const winIdx = graded.indexOf(winningItem);
 
-      localStorage.setItem("melodestiny_title", winner.candidate.title);
-      localStorage.setItem("melodestiny_lyrics", winningLyrics);
+      setCandidates(graded);
+      setWinnerIndex(winIdx);
+      setGenerationState("preview");
 
     } catch (err: any) {
       alert("Lyric generation failed: " + (err.message || err));
@@ -419,6 +461,119 @@ CRITICAL FORMATTING INSTRUCTIONS:
         </div>
 
       </div>
+
+      {/* Draft Candidates Selection Overlay */}
+      {generationState !== "idle" && candidates.length > 0 && (
+        <div 
+          className={`fixed inset-0 z-50 flex flex-col items-center justify-center p-4 md:p-8 bg-parchment/95 dark:bg-parchment/95 backdrop-blur-md overflow-hidden transition-opacity duration-1000 ${
+            generationState === "expanding" ? "opacity-0 pointer-events-none" : "opacity-100"
+          }`}
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E")` }}
+        >
+          {/* Header Section */}
+          <div className={`text-center max-w-2xl mb-8 transition-opacity duration-500 ${generationState === "expanding" ? "opacity-0" : "opacity-100"}`}>
+            <span className="font-mono text-xs uppercase tracking-widest text-gold font-bold">
+              OpenRouter Multi-Draft Evaluation
+            </span>
+            <h2 className="text-3xl md:text-4xl font-display font-bold mt-2 mb-3 text-ink">
+              {generationState === "preview" 
+                ? "Comparing Generated Drafts" 
+                : "Winner Draft Selected!"}
+            </h2>
+            <p className="font-body italic text-sepia text-sm">
+              {generationState === "preview" 
+                ? "Analyzing and scoring lyric variations in WebAssembly..." 
+                : "The highest-graded lyric composition is expanding..."}
+            </p>
+          </div>
+
+          {/* Cards Grid */}
+          <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-center md:items-stretch justify-center w-full max-w-6xl overflow-y-auto max-h-[70vh] md:overflow-visible md:max-h-none px-4 py-2">
+            {candidates.map((cand, idx) => {
+              const isWinner = idx === winnerIndex;
+              const isSelecting = generationState === "selecting";
+              const isExpanding = generationState === "expanding";
+              
+              // Animated card classes
+              let cardClass = "relative bg-cream border border-subtle rounded-lg shadow-card p-6 flex flex-col gap-4 overflow-hidden w-full max-w-sm md:w-1/3 md:max-w-none min-h-[360px] md:min-h-[420px]";
+              
+              // Add staggered entry animation
+              if (idx === 0) cardClass += " animate-card-1";
+              if (idx === 1) cardClass += " animate-card-2";
+              if (idx === 2) cardClass += " animate-card-3";
+              
+              // Add selection & expansion states
+              if (isSelecting) {
+                if (isWinner) {
+                  cardClass += " scale-105 border-gold winner-glow z-10 transition-all duration-[600ms] ease-out";
+                } else {
+                  cardClass += " opacity-30 blur-[1.5px] scale-95 transition-all duration-[600ms] ease-out";
+                }
+              } else if (isExpanding) {
+                if (isWinner) {
+                  cardClass += " scale-[3.5] rotate-3 opacity-0 blur-md transition-all duration-[900ms] ease-in-out z-50";
+                } else {
+                  cardClass += " opacity-0 scale-75 blur-lg transition-all duration-[900ms] ease-in-out";
+                }
+              } else {
+                cardClass += " transition-all duration-[600ms] ease-out";
+              }
+
+              // Get first 6 lines of candidate's lyrics
+              const lyricLines = cand.candidate.lyrics
+                .split("\n")
+                .filter((l: string) => l.trim().length > 0)
+                .slice(0, 6);
+
+              return (
+                <div key={idx} className={cardClass}>
+                  {/* Card Title Header */}
+                  <div className="flex justify-between items-center border-b border-subtle/50 pb-2.5">
+                    <span className="font-mono text-[10px] tracking-wider text-sepia/70 uppercase">
+                      Draft {idx === 0 ? "Alpha" : idx === 1 ? "Beta" : "Gamma"}
+                    </span>
+                    {isSelecting && isWinner && (
+                      <span className="font-display text-[10px] font-bold text-gold bg-gold/15 px-2 py-0.5 rounded-full border border-gold/30 tracking-widest uppercase animate-pulse">
+                        ⭐ Winner
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Song Title */}
+                  <div className="text-center py-2">
+                    <h3 className="font-display text-xl font-bold text-ink transition-colors leading-snug">
+                      {cand.candidate.title || "Untitled draft"}
+                    </h3>
+                  </div>
+
+                  {/* Lyrics Snippet */}
+                  <div className="relative overflow-hidden flex-grow my-2">
+                    <div className="font-body text-xs text-sepia/80 whitespace-pre-line italic leading-relaxed text-left">
+                      {lyricLines.map((line: string, lIdx: number) => (
+                        <div key={lIdx} className="mb-1 truncate">
+                          {line}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-cream to-transparent pointer-events-none"></div>
+                  </div>
+
+                  {/* Score Area */}
+                  <div className="mt-auto flex flex-col items-center justify-center pt-4 border-t border-subtle/50">
+                    <div className={`relative w-20 h-20 rounded-full border border-dashed border-sepia/40 flex flex-col items-center justify-center font-mono select-none ${
+                      idx === 0 ? "animate-stamp-1" : idx === 1 ? "animate-stamp-2" : "animate-stamp-3"
+                    }`}>
+                      <span className="text-[9px] text-sepia/50 tracking-wider uppercase leading-none mb-1">Score</span>
+                      <span className="text-2xl font-bold text-ink leading-none">{cand.score}</span>
+                      <span className="text-[8px] text-sepia/50 tracking-widest uppercase leading-none mt-1">Pts</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
