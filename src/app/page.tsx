@@ -24,7 +24,7 @@ export default function Home() {
   const [isEditorExpanded, setIsEditorExpanded] = useState(false);
 
   const [openRouterKey, setOpenRouterKey] = useState("");
-  const [openRouterModel, setOpenRouterModel] = useState("anthropic/claude-3.5-sonnet");
+  const [openRouterModel, setOpenRouterModel] = useState("anthropic/claude-opus-4.7");
   const [showApiPopover, setShowApiPopover] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   
@@ -39,7 +39,7 @@ export default function Home() {
     setLyrics(savedLyrics);
 
     const savedKey = localStorage.getItem("melodestiny_openrouter_key") || "";
-    const savedModel = localStorage.getItem("melodestiny_openrouter_model") || "anthropic/claude-3.5-sonnet";
+    const savedModel = localStorage.getItem("melodestiny_openrouter_model") || "anthropic/claude-opus-4.7";
     setOpenRouterKey(savedKey);
     setOpenRouterModel(savedModel);
   }, []);
@@ -291,10 +291,10 @@ CRITICAL FORMATTING INSTRUCTIONS:
                         }}
                         className="w-full text-xs font-body p-2 border border-subtle bg-parchment/20 rounded outline-none focus:border-gold cursor-pointer"
                       >
-                        <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
-                        <option value="google/gemini-2.5-pro">Gemini 2.5 Pro</option>
-                        <option value="meta-llama/llama-3.3-70b-instruct">Llama 3.3 70B</option>
-                        <option value="openai/gpt-4o-mini">GPT-4o Mini</option>
+                        <option value="anthropic/claude-opus-4.7">Claude Opus 4.7</option>
+                        <option value="deepseek/deepseek-v4-pro">DeepSeek V4 Pro</option>
+                        <option value="xiaomi/mimo-v2.5-pro">MiMo-V2.5-Pro</option>
+                        <option value="minimax/minimax-m2.7">Minimax M2.7</option>
                       </select>
                     </div>
 
