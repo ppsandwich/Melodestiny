@@ -219,85 +219,7 @@ function process_analysis_in_js(input_json_str, raw_result_str) {
         const num = parseInt(t.id.replace(/\D/g, ''));
         
         if (num === 21) {
-            // Recalculate T21 (First Line Hook) in JavaScript to bypass the Rust header-line bug!
-            const linesList = data.highlighted_lyrics || [];
-            const first_line = linesList.find(l => l.line_number > 0);
-            if (first_line) {
-                const text = first_line.text.toLowerCase();
-                const words = text.split(/\s+/).map(w => w.replace(/[^a-z]/g, "")).filter(w => w.length > 0);
-                
-                let score = 0.0;
-                const newFlags = [];
-                
-                // Check for questions
-                if (text.includes('?')) {
-                    score += 0.4;
-                    newFlags.push({
-                        type_: "Positive",
-                        line_number: first_line.line_number,
-                        message: "Opening with a question instantly engages the listener's curiosity."
-                    });
-                }
-                
-                // Check for direct address
-                const pronouns = ["i", "you", "we"];
-                for (const word of words) {
-                    if (pronouns.includes(word)) {
-                        score += 0.3;
-                        newFlags.push({
-                            type_: "Positive",
-                            line_number: first_line.line_number,
-                            message: `Using '${word}' in the first line grounds the perspective immediately.`
-                        });
-                        break;
-                    }
-                }
-                
-                // Check for concrete imagery
-                const scene_words = ["night", "day", "morning", "street", "car", "bed", "room", "bar", "club", "clock", "door", "window", "rain", "sun", "city", "town"];
-                for (const word of words) {
-                    if (scene_words.includes(word)) {
-                        score += 0.3;
-                        newFlags.push({
-                            type_: "Positive",
-                            line_number: first_line.line_number,
-                            message: `'${word}' sets a specific scene right away.`
-                        });
-                        break;
-                    }
-                }
-                
-                // Check for vague openings
-                const vague_words = ["something", "someone", "somewhere", "feel", "feeling"];
-                for (const word of words) {
-                    if (vague_words.includes(word)) {
-                        score -= 0.3;
-                        newFlags.push({
-                            type_: "Negative",
-                            line_number: first_line.line_number,
-                            message: `Opening with '${word}' is vague. Start in the middle of the action.`
-                        });
-                    }
-                }
-                
-                const raw_score = Math.max(0.0, Math.min(1.0, score));
-                t.raw_score = raw_score;
-                t.weighted_score = raw_score * t.weight * 100.0;
-                t.flags = newFlags;
-                
-                if (raw_score > 0.8) {
-                    t.feedback = "Incredible opening line! It sets the scene, perspective, and hooks the listener immediately.";
-                } else if (raw_score > 0.5) {
-                    t.feedback = "Good opening line, but it could be punchier. Try starting with a specific detail or a question.";
-                } else {
-                    t.feedback = "Your first line is a bit weak or vague. The listener might tune out. Drop them right into the action.";
-                }
-            } else {
-                t.raw_score = 0.0;
-                t.weighted_score = 0.0;
-                t.feedback = "No lyrics found to evaluate.";
-                t.flags = [];
-            }
+            // T21 is recalculated below after clean_lines is initialized
         }
 
         if (num === 3 || num === 4) {
@@ -319,6 +241,18 @@ function process_analysis_in_js(input_json_str, raw_result_str) {
     const clean_lines = lines.filter(l => {
         const t = l.text.trim();
         return t.length > 0 && !t.startsWith('[') && !t.startsWith('{');
+    });
+
+    // Recalculate T09, T17, and T21 to ensure accuracy and fairness
+    data.techniques.forEach(t => {
+        const num = parseInt(t.id.replace(/\D/g, ''));
+        if (num === 9) {
+            recalculate_t09(clean_lines, lines, t);
+        } else if (num === 17) {
+            recalculate_t17(clean_lines, lines, t);
+        } else if (num === 21) {
+            recalculate_t21(clean_lines, lines, t);
+        }
     });
 
     // 2. Compute T26 to T55
@@ -2706,4 +2640,261 @@ function run_t55(clean_lines, lines) {
         active: true,
         group_id: null
     };
+}
+
+function recalculate_t09(clean_lines, lines, t) {
+    const flags = [];
+    let rhyme_matches = 0;
+    let total_pairs_checked = 0;
+
+    function getRhymeSuffix(word) {
+        const clean = word.toLowerCase().replace(/[^a-z]/g, "");
+        if (clean.length < 2) return clean;
+        const vowels = "aeiouy";
+        let vowelIdx = -1;
+        for (let i = clean.length - 1; i >= 0; i--) {
+            if (vowels.includes(clean.charAt(i))) {
+                vowelIdx = i;
+                break;
+            }
+        }
+        if (vowelIdx === -1) return clean.substring(clean.length - 2);
+        
+        while (vowelIdx > 0 && vowels.includes(clean.charAt(vowelIdx - 1))) {
+            vowelIdx--;
+        }
+        const rawSuffix = clean.substring(vowelIdx);
+        return rawSuffix
+            .replace(/^ea/, "ee").replace(/^ee/, "ee").replace(/^ie/, "ee").replace(/^y$/, "ee")
+            .replace(/^ai/, "ay").replace(/^ay/, "ay").replace(/^ey/, "ay")
+            .replace(/^ou/, "ow").replace(/^ow/, "ow")
+            .replace(/^oi/, "oy").replace(/^oy/, "oy")
+            .replace(/^oo/, "oo").replace(/^ue/, "oo").replace(/^ew/, "oo")
+            .replace(/^oa/, "oh").replace(/^oe/, "oh").replace(/^ow$/, "oh")
+            .replace(/^igh/, "y").replace(/^ie$/, "y").replace(/^y$/, "y");
+    }
+
+    const sections = {};
+    lines.forEach(line => {
+        const text = line.text.trim();
+        if (text.length === 0 || text.startsWith('[') || text.startsWith('{')) return;
+        if (line.section) {
+            if (!sections[line.section]) {
+                sections[line.section] = [];
+            }
+            sections[line.section].push(line);
+        }
+    });
+
+    Object.entries(sections).forEach(([secName, secLines]) => {
+        if (secLines.length < 4) return;
+        
+        const ends = secLines.map(l => {
+            const words = l.text.split(/\s+/).filter(w => w.trim().length > 0);
+            if (words.length === 0) return "";
+            const lastWord = words[words.length - 1];
+            return lastWord.toLowerCase().replace(/[^a-z]/g, "");
+        });
+
+        const suffixes = ends.map(w => w ? getRhymeSuffix(w) : "");
+
+        for (let i = 0; i < ends.length - 3; i++) {
+            total_pairs_checked++;
+            
+            const e1 = ends[i], e2 = ends[i+1], e3 = ends[i+2], e4 = ends[i+3];
+            const s1 = suffixes[i], s2 = suffixes[i+1], s3 = suffixes[i+2], s4 = suffixes[i+3];
+
+            if (!e1 || !e2 || !e3 || !e4) continue;
+
+            const rhymes = (idx1, idx2) => {
+                const w1 = ends[idx1], w2 = ends[idx2];
+                const suf1 = suffixes[idx1], suf2 = suffixes[idx2];
+                if (w1 === w2) return false;
+                if (w1.length >= 2 && w2.length >= 2 && w1.substring(w1.length - 2) === w2.substring(w2.length - 2)) return true;
+                if (suf1 && suf2 && suf1 === suf2) return true;
+                return false;
+            };
+
+            const isAABB = rhymes(i, i+1) && rhymes(i+2, i+3);
+            const isABAB = rhymes(i, i+2) && rhymes(i+1, i+3);
+            const isABBA = rhymes(i, i+3) && rhymes(i+1, i+2);
+
+            if (isAABB || isABAB || isABBA) {
+                rhyme_matches++;
+            }
+        }
+    });
+
+    const consistency = total_pairs_checked > 0 ? (rhyme_matches / total_pairs_checked) : 1.0;
+
+    let raw_score, feedback;
+    if (total_pairs_checked === 0) {
+        raw_score = 0.8;
+        feedback = "Rhyme scheme consistency is stable. Write longer sections to fully evaluate AABB/ABAB patterns.";
+    } else if (consistency >= 0.4) {
+        raw_score = 1.0;
+        feedback = "Consistent rhyme schemes (AABB/ABAB) detected. This creates strong listener expectations.";
+        flags.push({
+            type_: "Positive",
+            line_number: 1,
+            message: "Consistent structural rhyme scheme detected (AABB/ABAB)."
+        });
+    } else {
+        raw_score = Math.max(0.4, consistency / 0.4);
+        feedback = "The rhyme scheme feels unpredictable. Establish a strong AABB or ABAB pattern to ground the listener.";
+        flags.push({
+            type_: "Negative",
+            line_number: 1,
+            message: "Inconsistent rhyme scheme. Perfect rhymes aren't required, but consistent structures are."
+        });
+    }
+
+    t.raw_score = raw_score;
+    t.weighted_score = raw_score * t.weight * 100;
+    t.feedback = feedback;
+    t.flags = flags;
+}
+
+function recalculate_t17(clean_lines, lines, t) {
+    const concrete_nouns = new Set([
+        "heart", "door", "rain", "car", "street", "blood", "skin", "fire", "ice", "bed", 
+        "phone", "light", "dark", "sun", "moon", "star", "water", "drink", "glass", "room", 
+        "floor", "wall", "window",
+        "clock", "time", "watch", "key", "doorway", "coffee", "cup", "tea", "cigarette", "smoke",
+        "mirror", "shadow", "highway", "train", "station", "bus", "engine", "wheel", "road", "dust",
+        "wind", "snow", "cold", "sky", "cloud", "storm", "thunder", "sea", "wave", "shore",
+        "beach", "sand", "ocean", "river", "lake", "stone", "rock", "dirt", "mud", "grass",
+        "flower", "rose", "tree", "leaf", "leaves", "wood", "forest", "field", "house", "home",
+        "roof", "ceiling", "stairs", "kitchen", "table", "chair", "plate", "knife", "fork", "spoon",
+        "bottle", "wine", "beer", "whiskey", "bar", "club", "seat", "booth", "stage", "guitar",
+        "piano", "song", "note", "sound", "voice", "eyes", "lips", "face", "hair", "hands",
+        "fingers", "arms", "legs", "feet", "tears", "smile", "laugh", "breath", "coat", "jacket",
+        "shoes", "dress", "shirt", "jeans", "pocket", "ring", "chain", "gold", "silver", "paper",
+        "pen", "book", "letter", "envelope", "picture", "photo", "frame", "bag", "box", "keyhole",
+        "city", "town", "bridge", "park", "bench", "corner", "alley", "roof", "skyline", "lantern"
+    ]);
+
+    let total_words = 0;
+    let concrete_count = 0;
+    const flags = [];
+
+    clean_lines.forEach(line => {
+        const words = line.text.split(/\s+/);
+        words.forEach(word => {
+            const clean = word.toLowerCase().replace(/[^a-z]/g, "");
+            if (clean.length === 0) return;
+            total_words++;
+            if (concrete_nouns.has(clean)) {
+                concrete_count++;
+                flags.push({
+                    type_: "Positive",
+                    line_number: line.line_number,
+                    message: "'" + clean + "' provides strong concrete imagery."
+                });
+            }
+        });
+    });
+
+    const density = total_words > 0 ? (concrete_count / total_words) : 0.0;
+
+    let raw_score, feedback;
+    if (total_words === 0) {
+        raw_score = 1.0;
+        feedback = "No words to evaluate.";
+    } else if (density >= 0.08 && density <= 0.25) {
+        raw_score = 1.0;
+        feedback = "Great use of imagery! " + (density * 100).toFixed(1) + "% of your words paint a concrete picture.";
+    } else if (density < 0.08) {
+        raw_score = Math.max(0.4, density / 0.08);
+        feedback = "Your concrete imagery density is " + (density * 100).toFixed(1) + "%. Try replacing abstract concepts with tangible things people can see and feel.";
+    } else {
+        raw_score = 0.8;
+        feedback = "Very high concrete imagery density (" + (density * 100).toFixed(1) + "%). Good, but don't overload with description.";
+    }
+
+    t.raw_score = raw_score;
+    t.weighted_score = raw_score * t.weight * 100;
+    t.feedback = feedback;
+    t.flags = flags;
+}
+
+function recalculate_t21(clean_lines, lines, t) {
+    const flags = [];
+    const first_line = clean_lines.find(l => l.line_number > 0);
+    
+    if (first_line) {
+        const text = first_line.text.toLowerCase();
+        const words = text.split(/\s+/).map(w => w.replace(/[^a-z]/g, "")).filter(w => w.length > 0);
+        
+        let hasQuestion = false;
+        let hasPronoun = false;
+        let hasScene = false;
+        let hasVague = false;
+        
+        if (text.includes('?')) {
+            hasQuestion = true;
+            flags.push({
+                type_: "Positive",
+                line_number: first_line.line_number,
+                message: "Opening with a question instantly engages the listener's curiosity."
+            });
+        }
+        
+        const pronouns = ["i", "you", "we", "me", "my", "your", "our"];
+        for (const word of words) {
+            if (pronouns.includes(word)) {
+                hasPronoun = true;
+                flags.push({
+                    type_: "Positive",
+                    line_number: first_line.line_number,
+                    message: "Using '" + word + "' in the first line grounds the perspective immediately."
+                });
+                break;
+            }
+        }
+        
+        const scene_words = ["night", "day", "morning", "street", "car", "bed", "room", "bar", "club", "clock", "door", "window", "rain", "sun", "city", "town", "light", "sky", "snow", "cold"];
+        for (const word of words) {
+            if (scene_words.includes(word)) {
+                hasScene = true;
+                flags.push({
+                    type_: "Positive",
+                    line_number: first_line.line_number,
+                    message: "'" + word + "' sets a specific scene right away."
+                });
+                break;
+            }
+        }
+        
+        const vague_words = ["something", "someone", "somewhere", "feel", "feeling"];
+        for (const word of words) {
+            if (vague_words.includes(word)) {
+                hasVague = true;
+                flags.push({
+                    type_: "Negative",
+                    line_number: first_line.line_number,
+                    message: "Opening with '" + word + "' is vague. Start in the middle of the action."
+                });
+            }
+        }
+        
+        let score = 0.0;
+        if (hasQuestion) score += 0.5;
+        if (hasPronoun) score += 0.5;
+        if (hasScene) score += 0.5;
+        if (hasVague) score -= 0.3;
+
+        const raw_score = Math.max(0.0, Math.min(1.0, score));
+        t.raw_score = raw_score;
+        t.weighted_score = raw_score * t.weight * 100;
+        t.feedback = raw_score > 0.8 ? "Incredible opening line! It sets the scene, perspective, and hooks the listener immediately." :
+                      raw_score > 0.5 ? "Good opening line, but it could be punchier. Try starting with a specific detail or a question." :
+                      "Your first line is a bit weak or vague. The listener might tune out. Drop them right into the action.";
+        t.flags = flags;
+    } else {
+        t.raw_score = 0.0;
+        t.weighted_score = 0.0;
+        t.feedback = "No lyrics found to evaluate.";
+        t.flags = [];
+    }
 }
