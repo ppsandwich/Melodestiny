@@ -150,6 +150,7 @@ export default function Home() {
     }
     
     setIsGenerating(true);
+    const promptSubject = userPrompt.trim() || "a random catchy subject (e.g. love, summer, late nights, or moving on)";
     
     const systemPrompt = `You are a multi-platinum, award-winning pop songwriter.
 Generate a song based on the user's request, strictly optimizing for the following Melodestiny grading engine criteria to achieve a perfect 100/100 score:
@@ -211,7 +212,7 @@ CRITICAL FORMATTING INSTRUCTIONS:
             model: openRouterModel,
             messages: [
               { role: "system", content: systemPrompt },
-              { role: "user", content: `Write a pop song about: ${userPrompt}` }
+              { role: "user", content: `Write a pop song about: ${promptSubject}` }
             ],
             response_format: { type: "json_object" },
             temperature: 0.9

@@ -83,12 +83,9 @@ export function LyricEditor({
                     />
                     <button
                       onClick={() => {
-                        if (localPrompt.trim()) {
-                          onGenerateLyrics(localPrompt);
-                        }
+                        onGenerateLyrics(localPrompt);
                       }}
-                      disabled={!localPrompt.trim()}
-                      className="px-4 py-2.5 rounded bg-gold text-cream hover:bg-gold-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-display font-medium text-xs tracking-wider uppercase shadow-sm cursor-pointer"
+                      className="px-4 py-2.5 rounded bg-gold text-cream hover:bg-gold-hover transition-all duration-300 font-display font-medium text-xs tracking-wider uppercase shadow-sm cursor-pointer"
                     >
                       Generate Lyrics
                     </button>
