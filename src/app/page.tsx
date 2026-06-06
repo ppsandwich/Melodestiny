@@ -403,8 +403,8 @@ CRITICAL FORMATTING INSTRUCTIONS:
         
         {/* Left Column: Unified Editor */}
         <div className="flex flex-col gap-6 min-w-0">
-          <header className="mb-4 relative">
-            <div className="absolute top-0 right-0 z-20 flex items-center gap-3">
+          <header className="mb-4 flex flex-col md:flex-row md:items-start justify-between gap-4 relative">
+            <div className="order-2 z-20 flex items-center gap-3 flex-wrap md:justify-end">
               {/* API Settings Popover */}
               <div className="relative">
                 <button
@@ -541,13 +541,15 @@ CRITICAL FORMATTING INSTRUCTIONS:
               </button>
               <ThemeToggle />
             </div>
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-title mb-2 text-ink flex items-center gap-3 sm:gap-4 flex-wrap break-words pr-12">
-              <FontAwesomeIcon icon={faPenFancy} className="text-gold opacity-90 flex-shrink-0" />
-              Melodestiny
-            </h1>
-            <p className="font-body text-sepia italic text-lg break-words">
-              The songwriter's analytical companion.
-            </p>
+            <div className="order-1">
+              <h1 className="text-5xl sm:text-6xl md:text-7xl font-title mb-2 text-ink flex items-center gap-3 sm:gap-4 flex-wrap break-words">
+                <FontAwesomeIcon icon={faPenFancy} className="text-gold opacity-90 flex-shrink-0" />
+                Melodestiny
+              </h1>
+              <p className="font-body text-sepia italic text-lg break-words">
+                The songwriter's analytical companion.
+              </p>
+            </div>
           </header>
 
           <div className="flex flex-col gap-2 w-full">
